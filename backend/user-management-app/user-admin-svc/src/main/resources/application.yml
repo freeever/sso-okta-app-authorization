@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: user-admin-svc
+
+  config:
+    import: configserver:http://localhost:9004
+
+# See other configurations in user-config-repo/user-admin-svc.yml

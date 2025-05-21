@@ -1,0 +1,617 @@
+{
+	"info": {
+		"_postman_id": "05341c4a-abd3-4894-a1a5-cb4d0582ae28",
+		"name": "SSO Course & User Management APIs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4037227"
+	},
+	"item": [
+		{
+			"name": "user-config-server",
+			"item": [
+				{
+					"name": "user-profile-svc",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9004/user-profile-svc/default",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9004",
+							"path": [
+								"user-profile-svc",
+								"default"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user-admin-svc",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9004/user-admin-svc/default",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9004",
+							"path": [
+								"user-admin-svc",
+								"default"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "user-profile-svc",
+			"item": [
+				{
+					"name": "Get my profile",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "clientSecret",
+									"value": "Ew-4IiHuFr6cgY1w3JhJ5PFWzvB-yZGx6xdD_y3rxhSWioOG-U_NGsCViCvlAxfe",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "0oaooqy915xbkRCKT5d7",
+									"type": "string"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://localhost:9001/login/oauth2/code/okta",
+									"type": "string"
+								},
+								{
+									"key": "state",
+									"value": "teset",
+									"type": "string"
+								},
+								{
+									"key": "client_authentication",
+									"value": "body",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid profile email",
+									"type": "string"
+								},
+								{
+									"key": "accessTokenUrl",
+									"value": "https://dev-50623690.okta.com/oauth2/default/v1/token",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "https://dev-50623690.okta.com/oauth2/default/v1/authorize",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9002/api/profile/me",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9002",
+							"path": [
+								"api",
+								"profile",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "state",
+									"value": "teset",
+									"type": "string"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://localhost:9011/login/oauth2/code/okta",
+									"type": "string"
+								},
+								{
+									"key": "client_authentication",
+									"value": "body",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid profile email",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "AC-_PThmy1t69J7Q1Je2g4HNRXq1mPqAUGDspKsy6dTFGk7RVV00a5jKiwZVuJ3z",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "0oaoor5c1wl5NU1ef5d7",
+									"type": "string"
+								},
+								{
+									"key": "accessTokenUrl",
+									"value": "https://dev-50623690.okta.com/oauth2/default/v1/token",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "https://dev-50623690.okta.com/oauth2/default/v1/authorize",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"oktaUserId\": \"daniel.xu4@ontario.ca\",\r\n    \"email\": \"daniel.xu4@ontario.ca\",\r\n    \"firstName\": \"Daniel\",\r\n    \"lastName\": \"Xu\",\r\n    \"gender\": \"M\",\r\n    \"dateOfBirth\": \"1999-09-09\",\r\n    \"role\": \"ADMIN\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:9002/api/profile",
+							"host": [
+								"localhost"
+							],
+							"port": "9002",
+							"path": [
+								"api",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "user-admin-svc",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "localhost:9003/api/admin/users",
+							"host": [
+								"localhost"
+							],
+							"port": "9003",
+							"path": [
+								"api",
+								"admin",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\": \"newuser@example.com\", \"firstName\": \"New\", \"lastName\": \"User\", \"role\": \"STUDENT\"}"
+						},
+						"url": {
+							"raw": "localhost:9003/api/admin/users",
+							"host": [
+								"localhost"
+							],
+							"port": "9003",
+							"path": [
+								"api",
+								"admin",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "course-config-server",
+			"item": [
+				{
+					"name": "course-management-svc",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9015/course-management-svc/default",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9015",
+							"path": [
+								"course-management-svc",
+								"default"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "course-query-svc",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9015/course-query-svc/default",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9015",
+							"path": [
+								"course-query-svc",
+								"default"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "course-registration-svc",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9015/course-registration-svc/default",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9015",
+							"path": [
+								"course-registration-svc",
+								"default"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "course-query-svc",
+			"item": [
+				{
+					"name": "Find Courses",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:9011/api/course-query",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9011",
+							"path": [
+								"api",
+								"course-query"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "course-management-svc",
+			"item": [
+				{
+					"name": "Create Course",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"Math 101\", \"description\": \"Basic Math\", \"teacherEmail\": \"teacher@example.com\"}"
+						},
+						"url": {
+							"raw": "localhost:9013/api/manage/courses",
+							"host": [
+								"localhost"
+							],
+							"port": "9013",
+							"path": [
+								"api",
+								"manage",
+								"courses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Courses",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "localhost:9013/api/manage/courses",
+							"host": [
+								"localhost"
+							],
+							"port": "9013",
+							"path": [
+								"api",
+								"manage",
+								"courses"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "course-registration-svc",
+			"item": [
+				{
+					"name": "Register Course",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "localhost:9014/api/course-registration?courseId=1",
+							"host": [
+								"localhost"
+							],
+							"port": "9014",
+							"path": [
+								"api",
+								"course-registration"
+							],
+							"query": [
+								{
+									"key": "courseId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Registrations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "localhost:9014/api/course-registration",
+							"host": [
+								"localhost"
+							],
+							"port": "9014",
+							"path": [
+								"api",
+								"course-registration"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Course Registrations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "localhost:9014/api/course-registration/course/1",
+							"host": [
+								"localhost"
+							],
+							"port": "9014",
+							"path": [
+								"api",
+								"course-registration",
+								"course",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Registration Status",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "localhost:9014/api/course-registration/1?status=APPROVED",
+							"host": [
+								"localhost"
+							],
+							"port": "9014",
+							"path": [
+								"api",
+								"course-registration",
+								"1"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "APPROVED"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Get New Access Token",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "state",
+							"value": "teset",
+							"type": "string"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "http://localhost:9011/login/oauth2/code/okta",
+							"type": "string"
+						},
+						{
+							"key": "client_authentication",
+							"value": "body",
+							"type": "string"
+						},
+						{
+							"key": "scope",
+							"value": "openid profile email",
+							"type": "string"
+						},
+						{
+							"key": "clientSecret",
+							"value": "AC-_PThmy1t69J7Q1Je2g4HNRXq1mPqAUGDspKsy6dTFGk7RVV00a5jKiwZVuJ3z",
+							"type": "string"
+						},
+						{
+							"key": "clientId",
+							"value": "0oaoor5c1wl5NU1ef5d7",
+							"type": "string"
+						},
+						{
+							"key": "accessTokenUrl",
+							"value": "https://dev-50623690.okta.com/oauth2/default/v1/token",
+							"type": "string"
+						},
+						{
+							"key": "authUrl",
+							"value": "https://dev-50623690.okta.com/oauth2/default/v1/authorize",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9001/api/profile/me",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9001",
+					"path": [
+						"api",
+						"profile",
+						"me"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

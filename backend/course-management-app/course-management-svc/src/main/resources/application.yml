@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: course-management-svc
+
+  config:
+    import: configserver:http://localhost:9015

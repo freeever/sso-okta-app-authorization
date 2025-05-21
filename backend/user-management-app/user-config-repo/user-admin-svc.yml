@@ -1,0 +1,36 @@
+server:
+  port: 9003
+
+spring:
+  config:
+    activate:
+      on-profile: default
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://dev-50623690.okta.com/oauth2/default
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/ssouser
+    username: ssouser
+    password: passw0rd
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:9761/eureka/
+
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+
+# URL of User Profile API in User Management App
+user-profile:
+  url: http://localhost:9002/api/profile/me

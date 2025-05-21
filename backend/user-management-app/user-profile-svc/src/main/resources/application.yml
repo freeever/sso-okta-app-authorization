@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: user-profile-svc
+
+  config:
+    import: configserver:http://localhost:9004
+
+# See other configurations in user-config-repo/user-profile-svc.yml

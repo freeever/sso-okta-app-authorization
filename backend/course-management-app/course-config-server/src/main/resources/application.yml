@@ -1,0 +1,15 @@
+server:
+  port: 9015
+
+spring:
+  application:
+    name: course-config-server
+  profiles:
+    active: native
+
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: file:../course-config-repo
+      fail-fast: true

@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: course-registration-svc
+
+  config:
+    import: configserver:http://localhost:9015

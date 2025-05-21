@@ -1,0 +1,48 @@
+server:
+  port: 9001
+
+spring:
+  application:
+    name: user-gateway
+  config:
+    import: configserver:http://localhost:9004
+
+  cloud:
+    gateway:
+      routes:
+        - id: user-profile
+          uri: lb://user-profile-svc
+          predicates:
+            - Path=/api/profile/**
+          filters:
+            - TokenRelay
+
+        - id: user-admin
+          uri: lb://user-admin-svc
+          predicates:
+            - Path=/api/admin/**
+          filters:
+            - TokenRelay
+
+  security:
+    oauth2:
+      client:
+        registration:
+          okta:
+            client-id: 0oaooqy915xbkRCKT5d7
+            client-secret: Ew-4IiHuFr6cgY1w3JhJ5PFWzvB-yZGx6xdD_y3rxhSWioOG-U_NGsCViCvlAxfe
+            scope: openid, profile, email
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/okta"
+        provider:
+          okta:
+            issuer-uri: https://dev-50623690.okta.com/oauth2/default
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:9761/eureka/
+
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
