@@ -46,3 +46,6 @@ eureka:
   instance:
     prefer-ip-address: true
     hostname: localhost
+
+angular:
+  redirect_url: http://localhost:4200

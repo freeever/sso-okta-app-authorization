@@ -1,0 +1,33 @@
+<h2>User Profile</h2>
+<form [formGroup]="form" (ngSubmit)="submit()" class="profile-form">
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>First Name</mat-label>
+    <input matInput formControlName="firstName" required />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Last Name</mat-label>
+    <input matInput formControlName="lastName" required />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Gender</mat-label>
+    <mat-select formControlName="gender">
+      <mat-option value="MALE">Male</mat-option>
+      <mat-option value="FEMALE">Female</mat-option>
+      <mat-option value="OTHER">Other</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Role</mat-label>
+    <mat-select formControlName="role">
+      <mat-option value="NONE">None</mat-option>
+      <mat-option value="STUDENT">Student</mat-option>
+      <mat-option value="TEACHER">Teacher</mat-option>
+      <mat-option value="ADMIN">Admin</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Update Profile</button>
+</form>
