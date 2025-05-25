@@ -3,6 +3,7 @@ import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../service/auth.service';
 import { environment } from '../../../environments/environment';
+import { LOGIN_URL } from '../../shared/constants';
 
 @Component({
   selector: 'app-header',
@@ -16,7 +17,7 @@ export class HeaderComponent {
   authService = inject(AuthService);
 
   login(): void {
-    window.location.href = `${environment.userBackendHost}/oauth2/authorization/okta`;
+    window.location.href = LOGIN_URL;
   }
 
   logout(): void {
