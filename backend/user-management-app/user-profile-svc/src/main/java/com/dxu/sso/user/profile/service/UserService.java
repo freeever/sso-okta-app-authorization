@@ -33,7 +33,7 @@ public class UserService extends OidcUserService {
         return userRepository.save(existing);
     }
 
-    public AppUser create(String email, String oktaUserId, String firstName, String lastName) {
+    public AppUser create(String oktaUserId, String email, String firstName, String lastName) {
         return userRepository.save(AppUser.builder()
                 .email(email)
                 .oktaUserId(oktaUserId)

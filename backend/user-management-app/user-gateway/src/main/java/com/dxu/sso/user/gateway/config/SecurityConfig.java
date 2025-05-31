@@ -11,8 +11,11 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import java.net.URI;
+import java.util.List;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -25,17 +28,15 @@ public class SecurityConfig {
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http,
                                                             ReactiveClientRegistrationRepository clientRegistrationRepository) {
         return http
-                .csrf(csrf -> csrf.disable())
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeExchange(authorize -> authorize
                                 .pathMatchers("/actuator/**", "/public/**").permitAll()
-                                .anyExchange().authenticated()
-                                  )
+                                .anyExchange().authenticated())
                 .oauth2Login(login -> login
-                                .authenticationSuccessHandler(redirectToAngular())
-                            )
+                                .authenticationSuccessHandler(redirectToAngular()))
                 .logout(logout -> logout
-                        .logoutSuccessHandler(oidcLogoutSuccessHandler(clientRegistrationRepository))
-                       )
+                        .logoutSuccessHandler(oidcLogoutSuccessHandler(clientRegistrationRepository)))
                 .build(); // ✅ No more .oauth2Client()
     }
 
@@ -52,5 +53,18 @@ public class SecurityConfig {
 
     private ServerAuthenticationSuccessHandler redirectToAngular() {
         return new RedirectServerAuthenticationSuccessHandler(angularRedirectUrl);
+    }
+
+    @Bean
+    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:4200")); // ✅ Allow Angular dev server
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true); // important for session/cookie-based login
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }

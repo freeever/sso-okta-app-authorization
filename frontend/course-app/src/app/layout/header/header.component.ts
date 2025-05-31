@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../service/auth.service';
 import { environment } from '../../../environments/environment';
 import { LOGIN_URL } from '../../shared/constants';
+import { Role } from '../../shared/core/role.enum';
 
 @Component({
   selector: 'app-header',
@@ -13,8 +14,17 @@ import { LOGIN_URL } from '../../shared/constants';
 })
 export class HeaderComponent {
 
-  logoutUrl: string = `${environment.userBackendHost}/logout`
-  authService = inject(AuthService);
+  logoutUrl: string = `${environment.userBackendHost}/logout`;
+
+  constructor(private authService: AuthService) {}
+
+  isAuthenticated() {
+    return !!this.authService.profile;
+  }
+
+  isAdmin() {
+    return this.authService.profile?.role === Role.ADMIN;
+  }
 
   login(): void {
     window.location.href = LOGIN_URL;

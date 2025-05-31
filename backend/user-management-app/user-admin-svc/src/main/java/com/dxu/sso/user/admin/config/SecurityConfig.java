@@ -15,6 +15,7 @@ public class SecurityConfig {
                         .requestMatchers("/public/**").permitAll()
                         .anyRequest().authenticated())
                 .csrf(csrf -> csrf.disable())
+                // enabled JWT-based resource server
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
 
         return http.build();

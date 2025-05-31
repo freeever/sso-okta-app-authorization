@@ -2,6 +2,8 @@ package com.dxu.sso.user.profile.controller;
 
 import com.dxu.sso.common.exception.SsoApplicationException;
 import com.dxu.sso.common.model.AppUser;
+import com.dxu.sso.common.security.RequireRoles;
+import com.dxu.sso.common.security.RequireUserProfile;
 import com.dxu.sso.user.profile.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/profile")
@@ -29,13 +33,15 @@ public class ProfileController {
             throws SsoApplicationException {
         log.info("Getting profile for user");
         // Log all claims
-        jwt.getClaims().forEach((k, v) -> log.debug("{} : {}", k, v));
+        jwt.getClaims().forEach((k, v) -> log.info("{} : {}", k, v));
 
         String email = jwt.getClaimAsString("email");
         AppUser user = userService.findByEmail(email);
         return ResponseEntity.ok(user);
     }
 
+    @RequireUserProfile
+    @RequireRoles({"ADMIN"})
     @PutMapping("/me")
     public ResponseEntity<AppUser> updateProfile(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody AppUser update)
             throws SsoApplicationException {
@@ -54,11 +60,16 @@ public class ProfileController {
         log.info("Creating profile for current user");
 
         AppUser user = userService.create(
-                jwt.getClaimAsString("username"),
+                jwt.getClaimAsString("sub"),
                 jwt.getClaimAsString("email"),
                 jwt.getClaimAsString("firstName"),
                 jwt.getClaimAsString("lastName"));
 
         return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/token")
+    public Map<String, Object> getTokenClaims(@AuthenticationPrincipal Jwt jwt) {
+        return jwt.getClaims();
     }
 }

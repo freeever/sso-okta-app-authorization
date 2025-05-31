@@ -2,11 +2,11 @@
   <div class="container-fluid">
     <a class="navbar-brand" routerLink="/">Course Management</a>
 
-    <div class="d-flex ms-auto" *ngIf="authService.profile; else guest">
+    <div class="d-flex ms-auto" *ngIf="isAuthenticated(); else guest">
       <a class="btn btn-light btn-sm me-2" routerLink="/profile">My Profile</a>
 
       <!-- Role-based options (ADMIN / TEACHER / STUDENT) -->
-      <a class="btn btn-warning btn-sm me-2" *ngIf="authService.profile?.role === 'ADMIN'" routerLink="/admin/users">Admin</a>
+      <a class="btn btn-warning btn-sm me-2" *ngIf="isAdmin()" routerLink="/admin/users">Admin</a>
       <a class="btn btn-light btn-sm me-2" routerLink="/courses">Courses</a>
 
       <!-- ✅ Logout button -->
@@ -17,7 +17,6 @@
     </div>
 
     <ng-template #guest>
-      <a class="btn btn-light btn-sm me-2" routerLink="/profile">My Profile</a>
       <button class="btn btn-outline-light btn-sm" (click)="login()">Login</button>
     </ng-template>
   </div>
