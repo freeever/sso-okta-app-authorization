@@ -9,7 +9,7 @@ import {
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { LOGIN_URL } from '../constants';
+import { URL_LOGIN } from './urls';
 
 @Injectable()
 export class AppInterceptor implements HttpInterceptor {
@@ -20,7 +20,7 @@ export class AppInterceptor implements HttpInterceptor {
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
           // ✅ Not authenticated — redirect to login
-          window.location.href = LOGIN_URL;
+          window.location.href = URL_LOGIN;
         } else if (error.status === 403) {
           // ✅ Not authorized — show snackbar
           this.snackBar.open('🚫 You are not authorized to access this resource.', 'Dismiss', {

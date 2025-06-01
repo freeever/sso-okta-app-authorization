@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
+import { URL_PROFILE } from '../../shared/core/urls';
 
 @Component({
   selector: 'app-user-profile',
@@ -33,14 +34,14 @@ export class UserProfileComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.http.get<any>('/api/profile/me', { withCredentials: true }).subscribe({
+    this.http.get<any>(URL_PROFILE, { withCredentials: true }).subscribe({
       next: user => this.form.patchValue(user),
       error: err => console.error('Failed to load profile', err)
     });
   }
 
   submit(): void {
-    this.http.put<any>('/api/profile/me', this.form.value, { withCredentials: true }).subscribe({
+    this.http.put<any>(URL_PROFILE, this.form.value, { withCredentials: true }).subscribe({
       next: () => alert('Profile updated successfully'),
       error: err => console.error('Failed to update profile', err)
     });

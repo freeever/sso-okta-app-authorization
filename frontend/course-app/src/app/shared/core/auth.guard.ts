@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { CanActivateFn } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { AuthService } from '../../service/auth.service';
-import { LOGIN_URL } from '../constants';
+import { URL_LOGIN } from './urls';
 
 export const AuthGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
@@ -10,7 +10,7 @@ export const AuthGuard: CanActivateFn = () => {
   return authService.isAuthenticated$.pipe(
     map(isAuth => {
       if (!isAuth) {
-        window.location.href = LOGIN_URL;
+        window.location.href = URL_LOGIN;
         return false;
       }
       return true;

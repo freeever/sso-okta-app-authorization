@@ -22,13 +22,13 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/profile")
+@RequestMapping("/api/profile/me")
 @RequiredArgsConstructor
 public class ProfileController {
 
     private final UserService userService;
 
-    @GetMapping("/me")
+    @GetMapping()
     public ResponseEntity<AppUser> getProfile(@AuthenticationPrincipal Jwt jwt)
             throws SsoApplicationException {
         log.info("Getting profile for user");
@@ -42,7 +42,7 @@ public class ProfileController {
 
     @RequireUserProfile
     @RequireRoles({"ADMIN"})
-    @PutMapping("/me")
+    @PutMapping()
     public ResponseEntity<AppUser> updateProfile(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody AppUser update)
             throws SsoApplicationException {
         String email = jwt.getClaimAsString("email");
@@ -52,11 +52,12 @@ public class ProfileController {
 
     /**
      * This is called when users log in to the system for the first time and there is not profile created yet.
+     *
      * @param jwt Jwt token
      * @return the created user profile
      */
     @PostMapping
-    public ResponseEntity<AppUser> create(@AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<AppUser> create(@AuthenticationPrincipal Jwt jwt) throws SsoApplicationException {
         log.info("Creating profile for current user");
 
         AppUser user = userService.create(
@@ -68,7 +69,7 @@ public class ProfileController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/token")
+    @GetMapping("token")
     public Map<String, Object> getTokenClaims(@AuthenticationPrincipal Jwt jwt) {
         return jwt.getClaims();
     }

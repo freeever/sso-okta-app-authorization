@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -40,10 +41,7 @@ public class ProfileWebClient {
             return userContext.getAppUser();
         }
 
-        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attrs == null) return null;
-
-        String authHeader = attrs.getRequest().getHeader(HttpHeaders.AUTHORIZATION);
+        String authHeader = getAuthHeader();
         if (authHeader == null || !authHeader.startsWith("Bearer ")) return null;
 
         AppUser user = webClientBuilder.build()
@@ -51,12 +49,48 @@ public class ProfileWebClient {
                 .uri(userProfileUrl)
                 .header(HttpHeaders.AUTHORIZATION, authHeader)
                 .retrieve()
-                .onStatus(status -> status.is4xxClientError(), response -> Mono.empty())
+                .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.empty())
                 .bodyToMono(AppUser.class)
                 .block();
 
         userContext.setAppUser(user); // ✅ cache it
         return user;
+    }
+
+    public AppUser createUserProfileIfNotExists() {
+        log.info("Attempting to create user profile if not exists");
+
+        AppUser profile = getUserProfile();
+        if (profile != null) {
+            return profile;
+        }
+
+        String authHeader = getAuthHeader();
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) return null;
+
+        AppUser user = webClientBuilder.build()
+                .post()
+                .uri(userProfileUrl)
+                .header(HttpHeaders.AUTHORIZATION, authHeader)
+                .retrieve()
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(), response -> {
+                    log.warn("Failed to create user profile, status={}", response.statusCode());
+                    return Mono.empty();
+                })
+                .bodyToMono(AppUser.class)
+                .block();
+        if (user != null) {
+            userContext.setAppUser(user); // ✅ cache it
+        }
+
+        return user;
+    }
+
+    private static String getAuthHeader() {
+        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attrs == null) return null;
+
+        return  attrs.getRequest().getHeader(HttpHeaders.AUTHORIZATION);
     }
 
 }

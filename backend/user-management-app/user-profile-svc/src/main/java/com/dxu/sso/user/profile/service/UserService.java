@@ -18,7 +18,7 @@ public class UserService extends OidcUserService {
 
     public AppUser findByEmail(String email) throws SsoApplicationException {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new SsoApplicationException(HttpStatus.BAD_REQUEST.value(), "User profile not found"));
+                .orElseThrow(() -> new SsoApplicationException(HttpStatus.NOT_FOUND.value(), "User profile not found"));
     }
 
     public AppUser updateByEmail(String email, AppUser update) throws SsoApplicationException {
@@ -33,7 +33,12 @@ public class UserService extends OidcUserService {
         return userRepository.save(existing);
     }
 
-    public AppUser create(String oktaUserId, String email, String firstName, String lastName) {
+    public AppUser create(String oktaUserId, String email, String firstName, String lastName) throws SsoApplicationException {
+        AppUser user = userRepository.findByEmail(email).orElse(null);
+        if (user != null) {
+            return user;
+        }
+
         return userRepository.save(AppUser.builder()
                 .email(email)
                 .oktaUserId(oktaUserId)

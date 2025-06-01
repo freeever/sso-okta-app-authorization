@@ -3,8 +3,8 @@ import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../service/auth.service';
 import { environment } from '../../../environments/environment';
-import { LOGIN_URL } from '../../shared/constants';
 import { Role } from '../../shared/core/role.enum';
+import { URL_LOGIN } from '../../shared/core/urls';
 
 @Component({
   selector: 'app-header',
@@ -27,7 +27,7 @@ export class HeaderComponent {
   }
 
   login(): void {
-    window.location.href = LOGIN_URL;
+    window.location.href = URL_LOGIN;
   }
 
   logout(): void {

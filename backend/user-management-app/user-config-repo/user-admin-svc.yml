@@ -33,4 +33,4 @@ eureka:
 
 # URL of User Profile API in User Management App
 user-profile:
-  url: http://localhost:9002/api/profile/me
+  url: http://localhost:9002/api/profile
