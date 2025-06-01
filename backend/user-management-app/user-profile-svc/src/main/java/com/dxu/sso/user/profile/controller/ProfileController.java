@@ -2,7 +2,6 @@ package com.dxu.sso.user.profile.controller;
 
 import com.dxu.sso.common.exception.SsoApplicationException;
 import com.dxu.sso.common.model.AppUser;
-import com.dxu.sso.common.security.RequireRoles;
 import com.dxu.sso.common.security.RequireUserProfile;
 import com.dxu.sso.user.profile.service.UserService;
 import jakarta.validation.Valid;
@@ -31,9 +30,7 @@ public class ProfileController {
     @GetMapping()
     public ResponseEntity<AppUser> getProfile(@AuthenticationPrincipal Jwt jwt)
             throws SsoApplicationException {
-        log.info("Getting profile for user");
-        // Log all claims
-        jwt.getClaims().forEach((k, v) -> log.info("{} : {}", k, v));
+        log.info("Fetching profile");
 
         String email = jwt.getClaimAsString("email");
         AppUser user = userService.findByEmail(email);
@@ -41,10 +38,11 @@ public class ProfileController {
     }
 
     @RequireUserProfile
-    @RequireRoles({"ADMIN"})
     @PutMapping()
     public ResponseEntity<AppUser> updateProfile(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody AppUser update)
             throws SsoApplicationException {
+        log.info("Updating profile");
+
         String email = jwt.getClaimAsString("email");
         AppUser user = userService.updateByEmail(email, update);
         return ResponseEntity.ok(user);

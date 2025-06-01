@@ -1,33 +1,81 @@
-<h2>User Profile</h2>
-<form [formGroup]="form" (ngSubmit)="submit()" class="profile-form">
-  <mat-form-field appearance="outline" class="w-100">
-    <mat-label>First Name</mat-label>
-    <input matInput formControlName="firstName" required />
-  </mat-form-field>
+<div class="container mt-4">
+  <h2 class="mb-4">User Profile</h2>
 
-  <mat-form-field appearance="outline" class="w-100">
-    <mat-label>Last Name</mat-label>
-    <input matInput formControlName="lastName" required />
-  </mat-form-field>
+  <div *ngIf="!isEditMode">
+    <div class="row mb-3">
+      <div class="col-md-12 mt-2"><strong>OKTA ID:</strong> {{ oktaUserId?.value }}</div>
+      <div class="col-md-6 mt-2"><strong>Email:</strong> {{ email?.value }}</div>
+      <div class="col-md-6 mt-2"><strong>First Name:</strong> {{ firstName?.value }}</div>
+      <div class="col-md-6 mt-2"><strong>Last Name:</strong> {{ lastName?.value }}</div>
+      <div class="col-md-6 mt-2"><strong>Date of Birth:</strong> {{ dateOfBirth?.value | date:'yyyy-MM-dd' }}</div>
+      <div class="col-md-6 mt-2"><strong>Gender:</strong> {{ gender?.value }}</div>
+      <div class="col-md-6 mt-2 mb-2  "><strong>Role:</strong> {{ role?.value }}</div>
+    </div>
+    <button mat-raised-button color="primary" (click)="toggleEdit()">Edit</button>
+  </div>
 
-  <mat-form-field appearance="outline" class="w-100">
-    <mat-label>Gender</mat-label>
-    <mat-select formControlName="gender">
-      <mat-option value="MALE">Male</mat-option>
-      <mat-option value="FEMALE">Female</mat-option>
-      <mat-option value="OTHER">Other</mat-option>
-    </mat-select>
-  </mat-form-field>
+  <form *ngIf="isEditMode" [formGroup]="form" (ngSubmit)="submit()" class="row g-3">
+    <div class="col-md-6">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>First Name</mat-label>
+        <input matInput formControlName="firstName" required />
+        <mat-error *ngIf="form.get('firstName')?.hasError('required')">First Name is required</mat-error>
+      </mat-form-field>
+    </div>
 
-  <mat-form-field appearance="outline" class="w-100">
-    <mat-label>Role</mat-label>
-    <mat-select formControlName="role">
-      <mat-option value="NONE">None</mat-option>
-      <mat-option value="STUDENT">Student</mat-option>
-      <mat-option value="TEACHER">Teacher</mat-option>
-      <mat-option value="ADMIN">Admin</mat-option>
-    </mat-select>
-  </mat-form-field>
+    <div class="col-md-6">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Last Name</mat-label>
+        <input matInput formControlName="lastName" required />
+        <mat-error *ngIf="form.get('lastName')?.hasError('required')">Last Name is required</mat-error>
+      </mat-form-field>
+    </div>
 
-  <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Update Profile</button>
-</form>
+    <div class="col-md-6">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" required />
+        <mat-error *ngIf="form.get('email')?.hasError('required')">Email is required</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-6">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Date of Birth</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="dateOfBirth">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-6">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Gender</mat-label>
+        <mat-select formControlName="gender" required>
+          <mat-option value="M">Male</mat-option>
+          <mat-option value="F">Female</mat-option>
+          <mat-option value="OTH">Prefer Not to Say</mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('gender')?.hasError('required')">Gender is required</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-6">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Role</mat-label>
+        <mat-select formControlName="role" required>
+          <mat-option value="NONE">None</mat-option>
+          <mat-option value="STUDENT">Student</mat-option>
+          <mat-option value="TEACHER">Teacher</mat-option>
+          <mat-option value="ADMIN">Admin</mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('role')?.hasError('required')">Role is required</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="col-12 d-flex justify-content-start gap-2">
+      <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Save</button>
+      <button mat-raised-button type="button" (click)="cancelEdit()">Cancel</button>
+    </div>
+  </form>
+</div>

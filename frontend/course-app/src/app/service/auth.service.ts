@@ -1,3 +1,4 @@
+import { ProfileService } from './profile.service';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
@@ -16,21 +17,19 @@ export class AuthService {
     return this._profile;
   }
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(private profileService: ProfileService, private router: Router) {
   }
 
   checkAuthentication(): void {
-    this.http.get<any>(URL_PROFILE, {
-      withCredentials: true // ✅ include session cookie!
-    }).subscribe({
+    this.profileService.getProfile().subscribe({
       next: (user) => {
         this._profile = user;
         this.authenticated.next(true);
       },
       error: (error: HttpErrorResponse) => {
         if (error.status === 404) {
-          // No user profile yet — create it
-          this.http.post(URL_PROFILE, {}, { withCredentials: true }).subscribe({
+          // Profile not found → try creating it
+          this.profileService.createProfile().subscribe({
             next: (createdUser) => {
               this._profile = createdUser;
               this.authenticated.next(true);
