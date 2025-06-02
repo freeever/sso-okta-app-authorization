@@ -30,7 +30,7 @@ export class UserForm {
       lastName: new FormControl(this.lastName, Validators.required),
       email: new FormControl(this.email, Validators.required),
       gender: new FormControl(this.gender, Validators.required),
-      dateOfBirth: new FormControl(this.dateOfBirth, Validators.required),
+      dateOfBirth: new FormControl(this.toDate(this.dateOfBirth), Validators.required),
       role: new FormControl(this.role, Validators.required)
     })
   }
@@ -46,5 +46,13 @@ export class UserForm {
       dateOfBirth: formValues.dateOfBirth,
       role: formValues.role,
     })
+  }
+
+  toDate(dateOfBirth: any) {
+    if (!dateOfBirth) {
+      return null;
+    }
+    const parts = dateOfBirth.split('-');
+    return new Date(+parts[0], +parts[1] - 1, +parts[2]);
   }
 }

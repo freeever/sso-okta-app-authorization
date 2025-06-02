@@ -8,7 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { DateAdapter, MatNativeDateModule } from '@angular/material/core';
 import { MatCardModule } from '@angular/material/card';
 import { format } from 'date-fns';
 
@@ -38,6 +38,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   private profileService = inject(ProfileService);
   private notification = inject(NotificationService);
+  private dateAdapter = inject(DateAdapter<Date>);
 
   private destroy$ = new Subject<void>();
   private profileData: any;
@@ -46,6 +47,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   form!: FormGroup;
 
   ngOnInit(): void {
+    this.dateAdapter.setLocale('en-CA'); // ensures yyyy-MM-dd format
     this.loadProfile();
   }
 
@@ -57,7 +59,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
           this.profileData = profile;
           this.form = new UserForm(profile).toForm();
         },
-        error: err => this.notification.error('Failed to load profile')
+        error: () => this.notification.error('Failed to load profile')
       });
   }
 
