@@ -4,6 +4,8 @@ import { BehaviorSubject } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { URL_PROFILE } from '../shared/core/urls';
 import { Router } from '@angular/router';
+import { User } from '../model/user.model';
+import { Role } from '../shared/core/role.enum';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -11,7 +13,7 @@ export class AuthService {
   private authenticated = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.authenticated.asObservable();
 
-  private _profile: any = null;
+  private _profile!: User | null;
 
   public get profile() {
     return this._profile;
@@ -49,5 +51,17 @@ export class AuthService {
         }
       }
     });
+  }
+
+  isAdmin() {
+    return this._profile?.role === Role.ADMIN.toString();
+  }
+
+  isStudent() {
+    return this._profile?.role === Role.STUDENT.toString();
+  }
+
+  isTeacher() {
+    return this._profile?.role === Role.TEACHER.toString();
   }
 }

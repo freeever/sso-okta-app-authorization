@@ -1,1 +1,22 @@
-<p>course-list works!</p>
+<div class="container mt-4">
+  <h2 class="mb-4">Course List</h2>
+
+  <mat-progress-spinner *ngIf="isLoading" mode="indeterminate"></mat-progress-spinner>
+
+  <div *ngIf="!isLoading && courses.length === 0" class="alert alert-info">
+    No courses available.
+  </div>
+
+  <mat-card *ngFor="let course of courses" class="mb-3">
+    <mat-card-title>{{ course.name }}</mat-card-title>
+    <mat-card-content>
+      <p>{{ course.description }}</p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button *ngIf="canEdit()" mat-raised-button color="accent">Edit</button>
+      <button *ngIf="canRegister()" mat-raised-button color="primary">
+        Register
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

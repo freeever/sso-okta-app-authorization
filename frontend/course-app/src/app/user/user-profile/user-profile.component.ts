@@ -12,7 +12,7 @@ import { DateAdapter, MatNativeDateModule } from '@angular/material/core';
 import { MatCardModule } from '@angular/material/card';
 import { format } from 'date-fns';
 
-import { UserForm } from '../../model/user-form.model';
+import { User } from '../../model/user.model';
 import { ProfileService } from './../../service/profile.service';
 import { NotificationService } from '../../service/notification.service';
 
@@ -57,7 +57,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       .subscribe({
         next: profile => {
           this.profileData = profile;
-          this.form = new UserForm(profile).toForm();
+          this.form = new User(profile).toForm();
         },
         error: () => this.notification.error('Failed to load profile')
       });
@@ -66,7 +66,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   submit(): void {
     this.form.markAllAsTouched();
     if (this.form.valid) {
-      const profile = new UserForm().toModel(this.form);
+      const profile = new User().toModel(this.form);
       const payload = {
         ...profile,
         dateOfBirth: profile.dateOfBirth ? format(profile.dateOfBirth, 'yyyy-MM-dd') : null
@@ -85,7 +85,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   toggleEdit() {
     if (this.isEditMode) {
-      this.form = new UserForm(this.profileData).toForm();
+      this.form = new User(this.profileData).toForm();
     }
     this.isEditMode = !this.isEditMode;
   }

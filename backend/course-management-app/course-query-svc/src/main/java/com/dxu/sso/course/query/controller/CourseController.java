@@ -18,18 +18,18 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/course-query")
+@RequestMapping("/api/courses")
 public class CourseController {
 
     private final CourseService courseService;
 
-//    @RequireUserProfile
+    @RequireUserProfile
     @GetMapping
-    public ResponseEntity<List<Course>> findCourses(@AuthenticationPrincipal Jwt jwt)
+    public ResponseEntity<List<Course>> findCourses()
             throws SsoApplicationException {
         log.info("[course-query-svc] - Fetching courses");
 
-        List<Course> courses = courseService.findCourses(jwt.getTokenValue());
+        List<Course> courses = courseService.findAll();
         return ResponseEntity.ok(courses);
     }
 }

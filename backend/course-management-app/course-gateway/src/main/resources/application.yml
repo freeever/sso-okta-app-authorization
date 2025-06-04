@@ -13,7 +13,7 @@ spring:
         - id: course-query
           uri: lb://course-query-svc
           predicates:
-            - Path=/api/course-query/**
+            - Path=/api/courses
           filters:
             - TokenRelay
 
@@ -48,7 +48,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:9762/eureka/
+      defaultZone: http://localhost:9763/eureka/
 
   instance:
     prefer-ip-address: true

@@ -1,7 +1,7 @@
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Role } from "../shared/core/role.enum";
 
-export class UserForm {
+export class User {
   oktaUserId!: string;
   firstName!: string;
   lastName!: string;
@@ -10,7 +10,7 @@ export class UserForm {
   dateOfBirth!: Date;
   role!: string;
 
-  constructor(init? : Partial<UserForm>) {
+  constructor(init? : Partial<User>) {
     Object.assign(this, init);
     if (!init) {
       this.initDefaults();
@@ -35,9 +35,9 @@ export class UserForm {
     })
   }
 
-  toModel(form: FormGroup): UserForm {
+  toModel(form: FormGroup): User {
     const formValues = form.getRawValue();
-    return new UserForm({
+    return new User({
       oktaUserId: formValues.oktaUserId,
       firstName: formValues.firstName,
       lastName: formValues.lastName,

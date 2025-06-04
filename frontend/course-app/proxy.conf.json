@@ -1,6 +1,12 @@
 {
-  "/api": {
+  "/api/profile": {
     "target": "http://localhost:9001",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/api/courses": {
+    "target": "http://localhost:9011",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"

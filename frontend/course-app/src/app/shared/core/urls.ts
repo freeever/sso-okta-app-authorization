@@ -5,3 +5,5 @@ export const URL_LOGIN = `${environment.userBackendHost}/oauth2/authorization/ok
 
 export const URL_PROFILE = '/api/profile/me';
 
+export const URL_COURSE = '/api/courses';
+
