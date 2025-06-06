@@ -57,35 +57,6 @@ public class ProfileWebClient {
         return user;
     }
 
-    public AppUser createUserProfileIfNotExists() {
-        log.info("Attempting to create user profile if not exists");
-
-        AppUser profile = getUserProfile();
-        if (profile != null) {
-            return profile;
-        }
-
-        String authHeader = getAuthHeader();
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) return null;
-
-        AppUser user = webClientBuilder.build()
-                .post()
-                .uri(userProfileUrl)
-                .header(HttpHeaders.AUTHORIZATION, authHeader)
-                .retrieve()
-                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(), response -> {
-                    log.warn("Failed to create user profile, status={}", response.statusCode());
-                    return Mono.empty();
-                })
-                .bodyToMono(AppUser.class)
-                .block();
-        if (user != null) {
-            userContext.setAppUser(user); // ✅ cache it
-        }
-
-        return user;
-    }
-
     private static String getAuthHeader() {
         ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attrs == null) return null;
