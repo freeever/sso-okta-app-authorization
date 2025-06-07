@@ -23,7 +23,7 @@ export class HeaderComponent {
   }
 
   isAdmin() {
-    return this.authService.profile?.role === Role.ADMIN.toString();
+    return this.authService.profile?.role === Role.ADMIN;
   }
 
   login(): void {
