@@ -15,6 +15,9 @@ import { format } from 'date-fns';
 import { User } from '../../model/user.model';
 import { ProfileService } from './../../service/profile.service';
 import { NotificationService } from '../../service/notification.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { UserAdminService } from '../../service/user-admin.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-user-profile',
@@ -29,29 +32,61 @@ import { NotificationService } from '../../service/notification.service';
     MatNativeDateModule,
     MatButtonModule,
     MatSnackBarModule,
-    MatCardModule
+    MatCardModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.scss'
 })
 export class UserProfileComponent implements OnInit, OnDestroy {
 
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private profileService = inject(ProfileService);
+  private adminService = inject(UserAdminService);
   private notification = inject(NotificationService);
   private dateAdapter = inject(DateAdapter<Date>);
 
   private destroy$ = new Subject<void>();
   private profileData: any;
+
+  userId?: number;
   isEditMode: boolean = false;
 
   form!: FormGroup;
 
   ngOnInit(): void {
     this.dateAdapter.setLocale('en-CA'); // ensures yyyy-MM-dd format
-    this.loadProfile();
+
+    this.userId = Number(this.route.snapshot.paramMap.get('id'));
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      if (id) {
+        // Fetch user's profile by admin
+        this.loadUser(+id);
+      } else {
+        // Load self profile
+        this.loadSelf();
+      }
+    });
   }
 
-  loadProfile(): void {
+  loadUser(id: number): void {
+    this.adminService.getUserById(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: user => {
+          this.profileData = user;
+          this.form = new User(user).toForm();
+        },
+        error: () => {
+          this.notification.error('Failed to load user information');
+          this.router.navigate(['/admin/users']);
+        }
+      });
+  }
+
+  loadSelf(): void {
     this.profileService.getProfile()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -59,7 +94,10 @@ export class UserProfileComponent implements OnInit, OnDestroy {
           this.profileData = profile;
           this.form = new User(profile).toForm();
         },
-        error: () => this.notification.error('Failed to load profile')
+        error: () => {
+          this.notification.error('Failed to load profile');
+          this.router.navigate(['/admin/users']);
+        }
       });
   }
 
@@ -72,14 +110,25 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         dateOfBirth: profile.dateOfBirth ? format(profile.dateOfBirth, 'yyyy-MM-dd') : null
       };
 
-      this.profileService.updateProfile(payload).subscribe({
-        next: profile => {
-          this.profileData = profile;
-          this.toggleEdit();
-          this.notification.success('Profile updated successfully');
-        },
-        error: err => this.notification.error('Failed to update profile')
-      })
+      if (this.userId) {
+        this.adminService.updateUserByAdmin(this.userId, payload).subscribe({
+          next: profile => {
+            this.profileData = profile;
+            this.toggleEdit();
+            this.notification.success('User information updated successfully');
+          },
+          error: err => this.notification.error('Failed to update profile')
+        })
+      } else {
+        this.profileService.updateProfile(payload).subscribe({
+          next: profile => {
+            this.profileData = profile;
+            this.toggleEdit();
+            this.notification.success('Profile updated successfully');
+          },
+          error: err => this.notification.error('Failed to update profile')
+        })
+      }
     }
   }
 

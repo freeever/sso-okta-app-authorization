@@ -4,11 +4,17 @@
   <div *ngIf="!isEditMode">
     <div class="row mb-3">
       <div class="col-md-12 mt-2"><strong>OKTA ID:</strong> {{ oktaUserId?.value }}</div>
-      <div class="col-md-6 mt-2"><strong>Email:</strong> {{ email?.value }}</div>
       <div class="col-md-6 mt-2"><strong>First Name:</strong> {{ firstName?.value }}</div>
       <div class="col-md-6 mt-2"><strong>Last Name:</strong> {{ lastName?.value }}</div>
+      <div class="col-md-6 mt-2"><strong>Email:</strong> {{ email?.value }}</div>
       <div class="col-md-6 mt-2"><strong>Date of Birth:</strong> {{ dateOfBirth?.value | date:'yyyy-MM-dd' }}</div>
-      <div class="col-md-6 mt-2"><strong>Gender:</strong> {{ gender?.value }}</div>
+      <div class="col-md-6 mt-2"><strong>Gender:</strong>
+         <ng-container [ngSwitch]="gender?.value">
+            <span *ngSwitchCase="'M'">Male</span>
+            <span *ngSwitchCase="'F'">Female</span>
+            <span *ngSwitchDefault>Other</span>
+          </ng-container>
+        </div>
       <div class="col-md-6 mt-2 mb-2  "><strong>Role:</strong> {{ role?.value }}</div>
     </div>
     <button mat-raised-button color="primary" (click)="toggleEdit()">Edit</button>
