@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SsoApplicationException extends Exception {
+public class SsoApplicationException extends RuntimeException {
 
     private final int statusCode;
 

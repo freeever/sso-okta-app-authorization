@@ -35,7 +35,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({ Exception.class })
     @ResponseBody
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<?> handleMccssDataAccessException(Exception ex, WebRequest req) {
+    public ResponseEntity<?> handleGenericException(Exception ex, WebRequest req) {
         log.error("Exception: ", ex);
 
         return ResponseEntity
