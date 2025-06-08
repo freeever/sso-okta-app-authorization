@@ -1,13 +1,13 @@
-package com.dxu.sso.user.gateway;
+package com.dxu.sso.api.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class UserGatewayApplication {
+public class ApiGatewayApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(UserGatewayApplication.class, args);
+        SpringApplication.run(ApiGatewayApplication.class, args);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.dxu.sso.user.gateway.config;
+package com.dxu.sso.api.gateway.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

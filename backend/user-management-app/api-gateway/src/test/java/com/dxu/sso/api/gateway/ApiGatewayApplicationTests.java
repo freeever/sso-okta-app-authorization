@@ -1,10 +1,10 @@
-package com.dxu.sso.user.gateway;
+package com.dxu.sso.api.gateway;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class UserGatewayApplicationTests {
+class ApiGatewayApplicationTests {
 
     @Test
     void contextLoads() {
