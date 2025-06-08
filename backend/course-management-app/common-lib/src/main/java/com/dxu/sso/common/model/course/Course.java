@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -26,5 +27,10 @@ public class Course {
 
     private String name;
     private String description;
-    private Long teacherId;
+
+    @JoinColumn(name = "teacher_id")
+    private Long teacherId;    // FK reference to AppUser.id (role=TEACHER)
+
+    // You cannot use a real @ManyToMany here because AppUser is in another schema
+    // Maintain the student list manually via the join table
 }
