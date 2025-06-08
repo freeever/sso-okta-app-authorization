@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.dxu.sso.user.eureka.server</groupId>
-    <artifactId>user-eureka-server</artifactId>
+    <artifactId>eureka-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>user-eureka-server</name>
     <description>user-eureka-server</description>
