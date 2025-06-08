@@ -1,10 +1,10 @@
-package com.dxu.sso.user.eureka.server;
+package com.dxu.sso.eureka.server;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class UserEurekaServerApplicationTests {
+class EurekaServerApplicationTests {
 
     @Test
     void contextLoads() {

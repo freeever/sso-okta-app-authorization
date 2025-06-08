@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: user-eureka-server
+    name: eureka-server
   config:
     import: configserver:http://localhost:9004
 
