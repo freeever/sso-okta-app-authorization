@@ -1,7 +1,7 @@
 package com.dxu.sso.user.admin.controller;
 
+import com.dxu.sso.common.dto.user.AppUserDto;
 import com.dxu.sso.common.exception.SsoApplicationException;
-import com.dxu.sso.common.model.AppUser;
 import com.dxu.sso.common.security.RequireRoles;
 import com.dxu.sso.user.admin.service.UserService;
 import jakarta.validation.Valid;
@@ -28,16 +28,16 @@ public class UserController {
 
     @RequireRoles({"ADMIN", "TEACHER"})
     @GetMapping("/{id}")
-    public ResponseEntity<AppUser> findById(@PathVariable Long id) throws SsoApplicationException {
+    public ResponseEntity<AppUserDto> findById(@PathVariable Long id) throws SsoApplicationException {
         log.info("get user by id: {}", id);
 
-        AppUser user = userService.findById(id);
+        AppUserDto user = userService.findById(id);
         return ResponseEntity.ok(user);
     }
 
     @RequireRoles({"ADMIN", "TEACHER"})
     @GetMapping
-    public List<AppUser> findAll() {
+    public List<AppUserDto> findAll() {
         log.info("find all users");
 
         return userService.findAll();
@@ -45,11 +45,11 @@ public class UserController {
 
     @RequireRoles({"ADMIN"})
     @PutMapping("/{id}")
-    public ResponseEntity<AppUser> update(@PathVariable Long id, @Valid @RequestBody AppUser update)
+    public ResponseEntity<AppUserDto> update(@PathVariable Long id, @Valid @RequestBody AppUserDto update)
             throws SsoApplicationException {
         log.info("update user by id: {}", id);
 
-        AppUser user = userService.updateUser(id, update);
+        AppUserDto user = userService.updateUser(id, update);
         return ResponseEntity.ok(user);
     }
 

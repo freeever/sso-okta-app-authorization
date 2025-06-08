@@ -1,7 +1,7 @@
 package com.dxu.sso.user.profile.controller;
 
+import com.dxu.sso.common.dto.user.AppUserDto;
 import com.dxu.sso.common.exception.SsoApplicationException;
-import com.dxu.sso.common.model.AppUser;
 import com.dxu.sso.common.security.RequireUserProfile;
 import com.dxu.sso.user.profile.service.UserService;
 import jakarta.validation.Valid;
@@ -28,23 +28,24 @@ public class ProfileController {
     private final UserService userService;
 
     @GetMapping()
-    public ResponseEntity<AppUser> getProfile(@AuthenticationPrincipal Jwt jwt)
+    public ResponseEntity<AppUserDto> getProfile(@AuthenticationPrincipal Jwt jwt)
             throws SsoApplicationException {
         log.info("Fetching profile");
 
         String email = jwt.getClaimAsString("email");
-        AppUser user = userService.findByEmail(email);
+        AppUserDto user = userService.findByEmail(email);
         return ResponseEntity.ok(user);
     }
 
     @RequireUserProfile
     @PutMapping()
-    public ResponseEntity<AppUser> updateProfile(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody AppUser update)
+    public ResponseEntity<AppUserDto> updateProfile(@AuthenticationPrincipal Jwt jwt,
+                                                    @Valid @RequestBody AppUserDto update)
             throws SsoApplicationException {
         log.info("Updating profile");
 
         String email = jwt.getClaimAsString("email");
-        AppUser user = userService.updateByEmail(email, update);
+        AppUserDto user = userService.updateByEmail(email, update);
         return ResponseEntity.ok(user);
     }
 
@@ -55,10 +56,10 @@ public class ProfileController {
      * @return the created user profile
      */
     @PostMapping
-    public ResponseEntity<AppUser> create(@AuthenticationPrincipal Jwt jwt) throws SsoApplicationException {
+    public ResponseEntity<AppUserDto> create(@AuthenticationPrincipal Jwt jwt) throws SsoApplicationException {
         log.info("Creating profile for current user");
 
-        AppUser user = userService.create(
+        AppUserDto user = userService.create(
                 jwt.getClaimAsString("sub"),
                 jwt.getClaimAsString("email"),
                 jwt.getClaimAsString("firstName"),

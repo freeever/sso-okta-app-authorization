@@ -1,6 +1,6 @@
 package com.dxu.sso.course.mgmt.controller;
 
-import com.dxu.sso.common.model.Course;
+import com.dxu.sso.common.model.course.Course;
 import com.dxu.sso.common.security.RequireRoles;
 import com.dxu.sso.common.security.RequireUserProfile;
 import lombok.RequiredArgsConstructor;

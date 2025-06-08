@@ -1,6 +1,6 @@
 package com.dxu.sso.common.service;
 
-import com.dxu.sso.common.model.AppUser;
+import com.dxu.sso.common.dto.user.AppUserDto;
 import com.dxu.sso.common.security.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -33,7 +33,7 @@ public class ProfileWebClient {
      * Based on the access token, call the user profile service to get the user information
      * @return user information
      */
-    public AppUser getUserProfile() {
+    public AppUserDto getUserProfile() {
         log.info("Fetching user profile");
 
         // Return cached user if already fetched
@@ -44,13 +44,13 @@ public class ProfileWebClient {
         String authHeader = getAuthHeader();
         if (authHeader == null || !authHeader.startsWith("Bearer ")) return null;
 
-        AppUser user = webClientBuilder.build()
+        AppUserDto user = webClientBuilder.build()
                 .get()
                 .uri(userProfileUrl)
                 .header(HttpHeaders.AUTHORIZATION, authHeader)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.empty())
-                .bodyToMono(AppUser.class)
+                .bodyToMono(AppUserDto.class)
                 .block();
 
         userContext.setAppUser(user); // ✅ cache it
