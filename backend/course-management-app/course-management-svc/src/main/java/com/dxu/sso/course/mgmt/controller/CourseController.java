@@ -20,9 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CourseController {
 
-    @Value("${user-profile.url:}")
-    private String userProfileUrl;
-
     @RequireUserProfile
     @RequireRoles({"ADMIN"})
     @PostMapping()

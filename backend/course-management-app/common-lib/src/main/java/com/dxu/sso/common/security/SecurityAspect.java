@@ -2,7 +2,7 @@ package com.dxu.sso.common.security;
 
 import com.dxu.sso.common.dto.user.AppUserDto;
 import com.dxu.sso.common.exception.SsoApplicationException;
-import com.dxu.sso.common.service.ProfileWebClient;
+import com.dxu.sso.common.integration.UserWebClient;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -18,12 +18,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityAspect {
 
-    private final ProfileWebClient profileWebClient;
+    private final UserWebClient userWebClient;
 
     @Around("@annotation(requireUserProfile)")
     public Object checkUserProfile(ProceedingJoinPoint joinPoint, RequireUserProfile requireUserProfile)
             throws Throwable {
-        AppUserDto user = profileWebClient.getUserProfile();
+        AppUserDto user = userWebClient.getUserProfile();
         if (user == null) {
             throw new SsoApplicationException(HttpStatus.FORBIDDEN.value(), "User profile not found");
         }
@@ -32,7 +32,7 @@ public class SecurityAspect {
 
     @Around("@annotation(requireRoles)")
     public Object checkUserRole(ProceedingJoinPoint joinPoint, RequireRoles requireRoles) throws Throwable {
-        AppUserDto user = profileWebClient.getUserProfile();
+        AppUserDto user = userWebClient.getUserProfile();
         if (user == null) {
             throw new SsoApplicationException(HttpStatus.FORBIDDEN.value(), "User profile not found");
         }

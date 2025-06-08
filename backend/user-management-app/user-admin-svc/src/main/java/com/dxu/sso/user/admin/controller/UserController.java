@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,6 +42,24 @@ public class UserController {
         log.info("find all users");
 
         return userService.findAll();
+    }
+
+    @RequireRoles({"ADMIN", "TEACHER"})
+    @PostMapping("/batch")
+    public List<AppUserDto> findByIds(@RequestBody List<Long> ids) {
+        log.info("Fetching users by IDs: {}", ids);
+
+        return userService.findByIds(ids);
+    }
+
+    @RequireRoles({"ADMIN"})
+    @PostMapping()
+    public ResponseEntity<AppUserDto> create(@Valid @RequestBody AppUserDto update)
+            throws SsoApplicationException {
+        log.info("Create new user");
+
+        AppUserDto user = userService.create(update);
+        return ResponseEntity.ok(user);
     }
 
     @RequireRoles({"ADMIN"})

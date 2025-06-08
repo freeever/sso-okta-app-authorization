@@ -1,14 +1,11 @@
 package com.dxu.sso.common.model.user;
 
 import com.dxu.sso.common.model.Role;
-import com.dxu.sso.common.model.course.Course;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -18,7 +15,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -54,10 +50,4 @@ public class AppUser {
     private String gender;
 
     private LocalDate dateOfBirth;
-
-    @OneToMany(mappedBy = "teacher")
-    private Set<Course> teachingCourses;
-
-    @ManyToMany(mappedBy = "students")
-    private Set<Course> enrolledCourses;
 }

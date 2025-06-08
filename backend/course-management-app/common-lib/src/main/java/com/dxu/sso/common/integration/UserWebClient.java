@@ -1,4 +1,4 @@
-package com.dxu.sso.common.service;
+package com.dxu.sso.common.integration;
 
 import com.dxu.sso.common.dto.user.AppUserDto;
 import com.dxu.sso.common.security.UserContext;
@@ -7,24 +7,30 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @Slf4j
 @Service
-public class ProfileWebClient {
+public class UserWebClient {
 
-    @Value("${user-profile.url:}")
+    @Value("${url.user.profile:}")
     private String userProfileUrl;
+
+    @Value("${url.user.admin:}")
+    private String userAdminUrl;
 
     private final WebClient.Builder webClientBuilder;
     private final UserContext userContext;
 
-    public ProfileWebClient(@Qualifier("commonWebClientBuilder") WebClient.Builder webClientBuilder,
-                            UserContext userContext) {
+    public UserWebClient(@Qualifier("userWebClientBuilder") WebClient.Builder webClientBuilder,
+                         UserContext userContext) {
         this.webClientBuilder = webClientBuilder;
         this.userContext = userContext;
     }
@@ -41,13 +47,10 @@ public class ProfileWebClient {
             return userContext.getAppUser();
         }
 
-        String authHeader = getAuthHeader();
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) return null;
-
         AppUserDto user = webClientBuilder.build()
                 .get()
                 .uri(userProfileUrl)
-                .header(HttpHeaders.AUTHORIZATION, authHeader)
+                .header(HttpHeaders.AUTHORIZATION, getAuthHeader())
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.empty())
                 .bodyToMono(AppUserDto.class)
@@ -57,11 +60,41 @@ public class ProfileWebClient {
         return user;
     }
 
+    public AppUserDto getUserById(Long id) {
+        log.info("Fetching user by id: {}", id);
+
+        return webClientBuilder.build()
+                .get()
+                .uri(userAdminUrl + "/" + id)
+                .header(HttpHeaders.AUTHORIZATION, getAuthHeader())
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.empty())
+                .bodyToMono(AppUserDto.class)
+                .block();
+    }
+
+    public List<AppUserDto> getUsersByIds(List<Long> ids) {
+        log.info("Fetching users by IDs: {}", ids);
+
+        return webClientBuilder.build()
+                .post()
+                .uri(userAdminUrl + "/batch")
+                .header(HttpHeaders.AUTHORIZATION, getAuthHeader())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(ids)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.empty())
+                .bodyToFlux(AppUserDto.class)
+                .collectList()
+                .block();
+    }
+
     private static String getAuthHeader() {
         ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attrs == null) return null;
 
-        return  attrs.getRequest().getHeader(HttpHeaders.AUTHORIZATION);
+        String authHeader = attrs.getRequest().getHeader(HttpHeaders.AUTHORIZATION);
+        return authHeader == null || !authHeader.startsWith("Bearer ") ? null : authHeader;
     }
 
 }

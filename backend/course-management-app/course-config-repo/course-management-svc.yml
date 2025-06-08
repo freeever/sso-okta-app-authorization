@@ -31,6 +31,8 @@ eureka:
     prefer-ip-address: true
     hostname: localhost
 
-# URL of User Profile API in User Management App
-user-profile:
-  url: http://localhost:9002/api/profile/me
+# User APIs URLs in user-profile-svc and user-admin-svc
+url:
+  user:
+    profile: http://localhost:9002/api/profile/me
+    admin: http://localhost:9003/api/users

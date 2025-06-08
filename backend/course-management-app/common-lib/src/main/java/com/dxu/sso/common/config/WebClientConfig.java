@@ -9,8 +9,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientConfig {
 
     @Bean
-    @Qualifier("commonWebClientBuilder")
-    public WebClient.Builder commonWebClientBuilder() {
+    @Qualifier("userWebClientBuilder")
+    public WebClient.Builder userWebClientBuilder() {
         return WebClient.builder();
     }
 }

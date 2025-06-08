@@ -34,6 +34,19 @@ public class UserService {
         return appUser == null ? null : userMapper.toDto(appUser);
     }
 
+    public List<AppUserDto> findByIds(List<Long> ids) {
+        return userRepository.findByIdIn(ids).stream()
+                .map(userMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public AppUserDto create(AppUserDto updateDto) {
+        AppUser appUser = userMapper.toEntity(updateDto);
+        appUser = userRepository.save(appUser);
+
+        return userMapper.toDto(appUser);
+    }
+
     public AppUserDto updateUser(Long id, AppUserDto updateDto) throws SsoApplicationException {
         AppUser userEntity = userRepository.findById(id)
                 .orElseThrow(() -> new SsoApplicationException(HttpStatus.NOT_FOUND.value(), "User profile not found"));
@@ -51,4 +64,5 @@ public class UserService {
     public void deleteById(Long id) {
         userRepository.deleteById(id);
     }
+
 }

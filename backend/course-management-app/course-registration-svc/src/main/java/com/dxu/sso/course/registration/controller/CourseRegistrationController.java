@@ -2,7 +2,7 @@ package com.dxu.sso.course.registration.controller;
 
 import com.dxu.sso.common.dto.user.AppUserDto;
 import com.dxu.sso.common.security.RequireRoles;
-import com.dxu.sso.common.service.ProfileWebClient;
+import com.dxu.sso.common.integration.UserWebClient;
 import com.dxu.sso.course.registration.model.CourseRegistration;
 import com.dxu.sso.course.registration.repository.CourseRegistrationRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,12 +23,12 @@ import java.util.List;
 public class CourseRegistrationController {
 
     private final CourseRegistrationRepository registrationRepo;
-    private final ProfileWebClient profileWebClient;
+    private final UserWebClient userWebClient;
 
     @RequireRoles({"STUDENT"})
     @PostMapping
     public ResponseEntity<?> register(@RequestParam Long courseId) {
-        AppUserDto user = profileWebClient.getUserProfile();
+        AppUserDto user = userWebClient.getUserProfile();
 
         CourseRegistration reg = CourseRegistration.builder()
                 .courseId(courseId)
@@ -48,7 +48,7 @@ public class CourseRegistrationController {
     @RequireRoles({"STUDENT"})
     @GetMapping
     public ResponseEntity<List<CourseRegistration>> myRegistrations() {
-        AppUserDto user = profileWebClient.getUserProfile();
+        AppUserDto user = userWebClient.getUserProfile();
         return ResponseEntity.ok(registrationRepo.findByStudentEmail(user.getEmail()));
     }
 
