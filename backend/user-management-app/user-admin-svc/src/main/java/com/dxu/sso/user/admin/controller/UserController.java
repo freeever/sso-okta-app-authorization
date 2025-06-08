@@ -54,10 +54,10 @@ public class UserController {
     }
 
     @RequireRoles({"ADMIN"})
-    @DeleteMapping
-    public void delete(@RequestBody List<Long> ids) {
-        log.info("delete users by ids: {}", ids);
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        log.info("delete users by id");
 
-        userService.deleteAllByIds(ids);
+        userService.deleteById(id);
     }
 }

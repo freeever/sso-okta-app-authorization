@@ -43,7 +43,7 @@ public class UserService {
         return userRepository.save(existing);
     }
 
-    public void deleteAllByIds(List<Long> ids) {
-        userRepository.deleteAllById(ids);
+    public void deleteById(Long id) {
+        userRepository.deleteById(id);
     }
 }
