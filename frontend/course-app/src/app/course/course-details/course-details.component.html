@@ -1,0 +1,120 @@
+<h2 class="mb-4">Course Details</h2>
+
+<div *ngIf="form" class="container mt-4">
+  <div *ngIf="!isEditing">
+    <mat-card>
+      <mat-card-title></mat-card-title>
+      <mat-card-content>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <strong>Name:</strong> {{ name?.value }}
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-12">
+            <strong>Description:</strong> {{ description?.value }}
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <strong>Start Date:</strong> {{ startDate?.value | date: 'yyyy-MM-dd' }}
+          </div>
+          <div class="col-md-6">
+            <strong>End Date:</strong> {{ endDate?.value | date: 'yyyy-MM-dd' }}
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <strong>Instructor:</strong>
+            {{ courseDetails.teacher.firstName }} {{ courseDetails.teacher.lastName }}
+            ({{ courseDetails.teacher.email }})
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-6">
+            <strong>Enrolled Students:</strong>
+            <ul class="list-group mt-2">
+              <li class="list-group-item py-1 px-2" *ngFor="let student of courseDetails?.enrolledStudents">
+                {{ student.firstName }} {{ student.lastName }} ({{ student.email }})
+              </li>
+            </ul>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions class="mt-4">
+        <button mat-raised-button color="secondary" (click)="gotoList()" class="me-3">Back</button>
+        <button mat-raised-button color="primary" (click)="toggleEdit()">Edit</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <div *ngIf="isEditing">
+    <form [formGroup]="form" *ngIf="isEditing && form" (ngSubmit)="submit()">
+      <div class="form-group col-md-6">
+        <mat-form-field class="w-100" appearance="outline">
+          <mat-label>Course Name</mat-label>
+          <input matInput formControlName="name" required />
+        </mat-form-field>
+      </div>
+
+      <div class="form-group col-md-6">
+        <mat-form-field class="w-100" appearance="outline">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description"></textarea>
+        </mat-form-field>
+      </div>
+
+      <div class="form-group col-md-3">
+        <mat-form-field class="w-100" appearance="outline">
+          <mat-label>Start Date</mat-label>
+          <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
+          <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+          <mat-datepicker #startPicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div class="form-group col-md-3">
+        <mat-form-field class="w-100" appearance="outline">
+          <mat-label>End Date</mat-label>
+          <input matInput [matDatepicker]="endPicker" formControlName="endDate" />
+          <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+          <mat-datepicker #endPicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <!-- Teacher Dropdown -->
+      <div class="form-group col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Instructor</mat-label>
+          <mat-select formControlName="teacherId">
+            <mat-option *ngFor="let user of allTeachers" [value]="user.id">
+              {{ user.firstName }} {{ user.lastName }} ({{ user.email }})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Enrolled Students (Multi-select with chips) -->
+      <div class="form-group col-md-6 mb-4">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Enrolled Students</mat-label>
+          <mat-select formControlName="enrolledStudentIds" multiple>
+            <mat-option *ngFor="let student of allStudents" [value]="student.id">
+              {{ student.firstName }} {{ student.lastName }} ({{ student.email }})
+            </mat-option>
+          </mat-select>
+          <mat-hint>Select one or more students</mat-hint>
+        </mat-form-field>
+      </div>
+
+      <div class="col-12 d-flex justify-content-start gap-2">
+        <button mat-raised-button type="button" (click)="cancelEdit()">Cancel</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Save</button>
+      </div>
+    </form>
+  </div>
+</div>

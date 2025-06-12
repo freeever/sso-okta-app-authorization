@@ -35,4 +35,4 @@ eureka:
 url:
   user:
     profile: http://localhost:9002/api/profile/me
-    admin: http://localhost:9003/api/users
+    admin: http://localhost:9003/api/admin/users

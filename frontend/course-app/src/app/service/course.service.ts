@@ -1,8 +1,10 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
+import { URL_COURSE, URL_COURSE_MANAGEMENT } from "../shared/core/urls";
+import { CourseSaveRequest } from "../model/course-request.model";
+import { CourseDetails } from "../model/course-details.model";
 import { Course } from "../model/course.model";
-import { URL_COURSE } from "../shared/core/urls";
 
 @Injectable({
   providedIn: 'root'
@@ -15,19 +17,19 @@ export class CourseService {
     return this.http.get<Course[]>(URL_COURSE, { withCredentials: true });
   }
 
-  getCourse(id: string): Observable<any> {
-    return this.http.get<any>(`${URL_COURSE}/${id}`, { withCredentials: true });
+  getCourseDetails(id: number): Observable<CourseDetails> {
+    return this.http.get<CourseDetails>(`${URL_COURSE}/${id}`, { withCredentials: true });
   }
 
-  updateCourse(id: string, course: any): Observable<any> {
-    return this.http.put<any>(`${URL_COURSE}/${id}`, course);
+  updateCourse(id: number, course: CourseSaveRequest): Observable<CourseDetails> {
+    return this.http.put<CourseDetails>(`${URL_COURSE_MANAGEMENT}/${id}`, course);
   }
 
-  createCourse(course: any): Observable<any> {
-    return this.http.post<any>(URL_COURSE, course);
+  createCourse(course: CourseSaveRequest): Observable<CourseDetails> {
+    return this.http.post<CourseDetails>(URL_COURSE_MANAGEMENT, course);
   }
 
-  deleteCourse(id: string): Observable<any> {
-    return this.http.delete<any>(`${URL_COURSE}/${id}`, { withCredentials: true });
+  deleteCourse(id: number): Observable<any> {
+    return this.http.delete<any>(`${URL_COURSE_MANAGEMENT}/${id}`, { withCredentials: true });
   }
 }

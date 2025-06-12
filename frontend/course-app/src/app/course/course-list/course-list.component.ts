@@ -1,38 +1,44 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CourseService } from '../../service/course.service';
 import { AuthService } from '../../service/auth.service';
-import { Course } from '../../model/course.model';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { Router } from '@angular/router';
+import { MatTableModule } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
+import { Course } from '../../model/course.model';
+import { Subject, takeUntil } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../shared/component/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-course-list',
   imports: [
     CommonModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatProgressSpinnerModule,
+    MatTableModule,
     MatButtonModule,
-    MatSnackBarModule,
-    MatCardModule
+    MatIconModule,
+    MatProgressSpinner
   ],
   templateUrl: './course-list.component.html',
   styleUrl: './course-list.component.scss',
   standalone: true
 })
-export class CourseListComponent implements OnInit {
+export class CourseListComponent implements OnInit, OnDestroy {
+
+  private destroy$ = new Subject<void>();
 
   courses: Course[] = [];
+  displayedColumns = ['name', 'description', 'startDate', 'endDate', 'teacher', 'actions'];
   isLoading = true;
 
   constructor(private courseService: CourseService,
-                        private authService: AuthService,
-                        private snackBar: MatSnackBar
+              private authService: AuthService,
+              private snackBar: MatSnackBar,
+              private router: Router,
+              private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -52,11 +58,52 @@ export class CourseListComponent implements OnInit {
     });
   }
 
+  viewCourse(id: number) {
+    this.router.navigate(['/courses', id]);
+  }
+
+  openDeleteDialog(course: Course): void {
+    this.dialog.open(ConfirmDialogComponent, {
+      width: '600px',
+      data: {
+        title: 'Confirm Delete',
+        contentHtml: `Are you sure you want to delete course <strong>${course.name}</strong>?`,
+        confirmButtonLabel: 'Delete',
+        cancelButtonLabel: 'Cancel',
+        showCancelButton: true,
+        onConfirm: () => this.deleteCourse(course.id)
+      }
+    })
+  }
+
+  private deleteCourse(id: number) {
+    this.courseService.deleteCourse(id).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: () => {
+        this.snackBar.open('✅ Course deleted', 'Dismiss', { duration: 3000 });
+        this.loadCourses();
+      },
+      error: () => {
+        this.snackBar.open('❌ Failed to delete course', 'Dismiss', { duration: 3000 });
+      }
+    });
+  }
+
+  addCourse(): void {
+    this.router.navigate(['/courses/new']);
+  }
+
   canEdit(): boolean {
     return this.authService.isAdmin();
   }
 
   canRegister(): boolean {
     return this.authService.isStudent();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

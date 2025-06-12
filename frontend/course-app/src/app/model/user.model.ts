@@ -25,7 +25,7 @@ export class User extends BaseModel {
     this.dateOfBirth = new Date();
   }
 
-  toForm() {
+  toForm(): FormGroup {
     return new FormGroup({
       id: new FormControl(this.id),
       oktaUserId: new FormControl(this.oktaUserId, Validators.required),

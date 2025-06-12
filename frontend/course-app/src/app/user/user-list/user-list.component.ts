@@ -1,5 +1,5 @@
 import { Router } from '@angular/router';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { User } from '../../model/user.model';
 import { UserAdminService } from '../../service/user-admin.service';
 import { MatTableModule } from '@angular/material/table';
@@ -9,7 +9,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { UserDeleteDialogComponent } from '../user-delete-dialog.component';
+import { ConfirmDialogComponent } from '../../shared/component/confirm-dialog/confirm-dialog.component';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-user-list',
@@ -24,7 +25,9 @@ import { UserDeleteDialogComponent } from '../user-delete-dialog.component';
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss',
 })
-export class UserListComponent implements OnInit {
+export class UserListComponent implements OnInit, OnDestroy {
+
+  private destroy$ = new Subject<void>();
 
   users: User[] = [];
   displayedColumns = ['firstName', 'lastName', 'email', 'role', 'actions'];
@@ -50,27 +53,39 @@ export class UserListComponent implements OnInit {
     });
   }
   viewUser(id: number): void {
-    this.router.navigate(['/admin/users', id]);
+    this.router.navigate(['/users', id]);
   }
 
   openDeleteDialog(user: any): void {
-    const dialogRef = this.dialog.open(UserDeleteDialogComponent, {
-      width: '400px',
-      data: { id: user.id, firstName: user.firstName, lastName: user.lastName }
-    });
-
-    dialogRef.afterClosed().subscribe(confirmed => {
-      if (confirmed) {
-        this.adminService.deleteUser(user.id).subscribe({
-          next: () => {
-            this.snackBar.open('✅ User deleted', 'Dismiss', { duration: 3000 });
-            this.loadUsers();
-          },
-          error: () => {
-            this.snackBar.open('❌ Failed to delete user', 'Dismiss', { duration: 3000 });
-          }
-        });
+    this.dialog.open(ConfirmDialogComponent, {
+      width: '600px',
+      data: {
+        title: 'Confirm Delete',
+        contentHtml: `Are you sure you want to delete user <strong>${user.lastName}, ${user.firstName}</strong>?`,
+        confirmButtonLabel: 'Delete',
+        cancelButtonLabel: 'Cancel',
+        showCancelButton: true,
+        onConfirm: () => this.deleteUser(user.id)
       }
     });
+  }
+
+  private deleteUser(id: number) {
+    this.adminService.deleteUser(id).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: () => {
+        this.snackBar.open('✅ User deleted', 'Dismiss', { duration: 3000 });
+        this.loadUsers();
+      },
+      error: () => {
+        this.snackBar.open('❌ Failed to delete user', 'Dismiss', { duration: 3000 });
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

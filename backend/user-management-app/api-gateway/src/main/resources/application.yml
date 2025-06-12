@@ -38,7 +38,7 @@ spring:
         - id: course-management
           uri: lb://course-management-svc
           predicates:
-            - Path=/api/course-mgmt/**
+            - Path=/api/manage/courses/**
           filters:
             - TokenRelay
 

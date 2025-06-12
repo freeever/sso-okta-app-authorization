@@ -48,7 +48,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   private dateAdapter = inject(DateAdapter<Date>);
 
   private destroy$ = new Subject<void>();
-  private profileData: any;
+  private profileData!: User;
 
   userId?: number;
   isEditMode: boolean = false;
@@ -58,7 +58,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.dateAdapter.setLocale('en-CA'); // ensures yyyy-MM-dd format
 
-    this.userId = Number(this.route.snapshot.paramMap.get('id'));
+    this.userId = +this.route.snapshot.paramMap.get('id')!;
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
@@ -81,7 +81,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         },
         error: () => {
           this.notification.error('Failed to load user information');
-          this.router.navigate(['/admin/users']);
+          this.router.navigate(['/users']);
         }
       });
   }
@@ -96,7 +96,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         },
         error: () => {
           this.notification.error('Failed to load profile');
-          this.router.navigate(['/admin/users']);
+          this.router.navigate(['/users']);
         }
       });
   }

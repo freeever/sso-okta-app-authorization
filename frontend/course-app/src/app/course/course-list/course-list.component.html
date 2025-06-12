@@ -1,22 +1,67 @@
 <div class="container mt-4">
-  <h2 class="mb-4">Course List</h2>
+  <h2 class="mb-4">Courses</h2>
 
-  <mat-progress-spinner *ngIf="isLoading" mode="indeterminate"></mat-progress-spinner>
-
-  <div *ngIf="!isLoading && courses.length === 0" class="alert alert-info">
-    No courses available.
-  </div>
-
-  <mat-card *ngFor="let course of courses" class="mb-3">
-    <mat-card-title>{{ course.name }}</mat-card-title>
-    <mat-card-content>
-      <p>{{ course.description }}</p>
-    </mat-card-content>
-    <mat-card-actions>
-      <button *ngIf="canEdit()" mat-raised-button color="accent">Edit</button>
-      <button *ngIf="canRegister()" mat-raised-button color="primary">
-        Register
+  @if (!isLoading && courses.length === 0) {
+    <div class="alert alert-info">
+      No courses available.
+    </div>
+  } @else {
+    <div class="d-flex justify-content-between align-items-center">
+      <!-- Add Course Button - aligned to the left -->
+      <button mat-icon-button color="primary" (click)="addCourse()">
+        <mat-icon class="me-1">add</mat-icon>
       </button>
-    </mat-card-actions>
-  </mat-card>
+
+      <!-- Refresh Button - aligned to the right -->
+      <button mat-icon-button color="primary" (click)="loadCourses()" matTooltip="Refresh Course List">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+
+    <mat-progress-spinner *ngIf="isLoading" mode="indeterminate"></mat-progress-spinner>
+
+    <table mat-table [dataSource]="courses" class="mat-elevation-z8">
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Course Name</th>
+        <td mat-cell *matCellDef="let course">
+          <button mat-button color="primary" (click)="viewCourse(course.id)" class="text-decoration-underline">
+            {{ course.name }}
+          </button>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef>Description</th>
+        <td mat-cell *matCellDef="let course">{{ course.description }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="startDate">
+        <th mat-header-cell *matHeaderCellDef>Start Date</th>
+        <td mat-cell *matCellDef="let course">{{ course.startDate }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="endDate">
+        <th mat-header-cell *matHeaderCellDef>End Date</th>
+        <td mat-cell *matCellDef="let course">{{ course.endDate }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="teacher">
+        <th mat-header-cell *matHeaderCellDef>Instructor</th>
+        <td mat-cell *matCellDef="let course">{{ course?.teacher?.lastName }}, {{ course?.teacher?.firstName }}</td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let course">
+          <button mat-icon-button color="warn" (click)="openDeleteDialog(course)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  }
 </div>

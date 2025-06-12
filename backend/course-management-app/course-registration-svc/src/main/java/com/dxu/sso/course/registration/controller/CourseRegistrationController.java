@@ -39,12 +39,6 @@ public class CourseRegistrationController {
         return ResponseEntity.ok(registrationRepo.save(reg));
     }
 
-    @RequireRoles({"TEACHER", "ADMIN"})
-    @GetMapping("/course/{courseId}")
-    public ResponseEntity<List<CourseRegistration>> getRegistrationsForCourse(@PathVariable Long courseId) {
-        return ResponseEntity.ok(registrationRepo.findByCourseId(courseId));
-    }
-
     @RequireRoles({"STUDENT"})
     @GetMapping
     public ResponseEntity<List<CourseRegistration>> myRegistrations() {
@@ -52,15 +46,4 @@ public class CourseRegistrationController {
         return ResponseEntity.ok(registrationRepo.findByStudentEmail(user.getEmail()));
     }
 
-    @RequireRoles({"TEACHER"})
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestParam String status) {
-        CourseRegistration reg = registrationRepo.findById(id).orElse(null);
-        if (reg == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        reg.setStatus(status.toUpperCase());
-        return ResponseEntity.ok(registrationRepo.save(reg));
-    }
 }

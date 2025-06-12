@@ -9,3 +9,5 @@ export const URL_USERS = '/api/admin/users';
 
 export const URL_COURSE = '/api/courses';
 
+export const URL_COURSE_MANAGEMENT = '/api/manage/courses';
+

@@ -1,5 +1,8 @@
 package com.dxu.sso.common.model.course;
 
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,6 +14,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -27,10 +34,14 @@ public class Course {
 
     private String name;
     private String description;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     @JoinColumn(name = "teacher_id")
     private Long teacherId;    // FK reference to AppUser.id (role=TEACHER)
 
-    // You cannot use a real @ManyToMany here because AppUser is in another schema
-    // Maintain the student list manually via the join table
+    @ElementCollection
+    @CollectionTable(name = "course_enrollment", schema = "ssocourse", joinColumns = @JoinColumn(name = "course_id"))
+    @Column(name = "student_id")
+    private List<Long> enrolledStudentIds = new ArrayList<>();
 }
