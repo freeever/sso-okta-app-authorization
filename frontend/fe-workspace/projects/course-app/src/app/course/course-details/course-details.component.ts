@@ -4,7 +4,6 @@ import { Subject, takeUntil } from 'rxjs';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CourseService } from '../../service/course.service';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -13,7 +12,7 @@ import { DateAdapter, MatNativeDateModule, MatOptionModule } from '@angular/mate
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
-import { NotificationService, Role, User, UserAdminService } from 'shared-lib';
+import { AuthService, NotificationService, Role, User, UserAdminService } from 'shared-lib';
 
 @Component({
   selector: 'app-course-details',
@@ -26,7 +25,6 @@ import { NotificationService, Role, User, UserAdminService } from 'shared-lib';
     MatDatepickerModule,
     MatNativeDateModule,
     MatButtonModule,
-    MatSnackBarModule,
     MatOptionModule,
     MatCardModule
   ],
@@ -39,9 +37,9 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private courseService  = inject(CourseService);
   private userService = inject(UserAdminService);
-  private snackBar = inject(MatSnackBar);
+  private authService = inject(AuthService);
   private dateAdapter = inject(DateAdapter<Date>);
-  private notification = inject(NotificationService);
+  private notificationService = inject(NotificationService);
 
   private destroy$ = new Subject<void>();
 
@@ -101,7 +99,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe({
       next: (savedCourse) => {
-        this.snackBar.open('✅ Course saved successfully', 'Dismiss', { duration: 3000 });
+        this.notificationService.success('Course saved successfully');
 
         // Update the model with new data from response
         this.courseDetails = new CourseDetails(savedCourse);
@@ -116,7 +114,7 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
         }
       },
       error: () => {
-        this.snackBar.open('❌ Failed to save course', 'Dismiss', { duration: 3000 });
+        this.notificationService.error('Failed to save course');
       }
     });
   }
@@ -146,6 +144,10 @@ export class CourseDetailsComponent implements OnInit, OnDestroy {
     if (this.isNew) {
       this.router.navigate(['/courses']);
     }
+  }
+
+  canDedit() {
+    return this.authService.isAdmin();
   }
 
   get name() {

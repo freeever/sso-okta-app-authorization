@@ -8,12 +8,12 @@ import {
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { NotificationService } from 'shared-lib';
 
 @Injectable()
 export class AppInterceptor implements HttpInterceptor {
-  private snackBar = inject(MatSnackBar);
+  private notificationService = inject(NotificationService);
   private router = inject(Router);
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -21,20 +21,12 @@ export class AppInterceptor implements HttpInterceptor {
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
           // ✅ This for logged in user who does not have profile
-          this.snackBar.open('🚫 You do not have profile on our site.', 'Dismiss', {
-            duration: 5000,
-            verticalPosition: 'top',
-            panelClass: 'mat-mdc-snack-bar-warn'
-          });
+          this.notificationService.error('🚫 You do not have profile on our site.');
           // ✅ No profile. Go to dashboard page
           this.router.navigate(['']);
         } else if (error.status === 403) {
           // ✅ Not authorized — show snackbar
-          this.snackBar.open('🚫 You are not authorized to access this resource.', 'Dismiss', {
-            duration: 5000,
-            verticalPosition: 'top',
-            panelClass: 'mat-mdc-snack-bar-warn'
-          });
+          this.notificationService.error('🚫 You are not authorized to access this resource.');
           // ✅ No profile. Go to dashboard page
           this.router.navigate(['']);
         }
