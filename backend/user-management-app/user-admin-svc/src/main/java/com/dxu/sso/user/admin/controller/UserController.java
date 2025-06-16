@@ -44,7 +44,6 @@ public class UserController {
         return userService.findAll();
     }
 
-    @RequireRoles({"ADMIN", "TEACHER"})
     @PostMapping("/batch")
     public List<AppUserDto> findByIds(@RequestBody List<Long> ids) {
         log.info("Fetching users by IDs: {}", ids);

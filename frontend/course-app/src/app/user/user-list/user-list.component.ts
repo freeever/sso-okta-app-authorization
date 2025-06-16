@@ -8,9 +8,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmDialogComponent } from '../../shared/component/confirm-dialog/confirm-dialog.component';
 import { Subject, takeUntil } from 'rxjs';
+import { NotificationService } from '../../service/notification.service';
 
 @Component({
   selector: 'app-user-list',
@@ -37,7 +37,7 @@ export class UserListComponent implements OnInit, OnDestroy {
     private router: Router,
     private adminService: UserAdminService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar) {}
+    private notificationService: NotificationService) {}
 
   ngOnInit(): void {
     this.loadUsers();
@@ -49,7 +49,7 @@ export class UserListComponent implements OnInit, OnDestroy {
         this.users = users;
         this.isLoading = false;
       },
-      error: () => this.snackBar.open('❌ Failed to load users', 'Dismiss', { duration: 3000 })
+      error: () => this.notificationService.error('Failed to load users')
     });
   }
   viewUser(id: number): void {
@@ -75,11 +75,11 @@ export class UserListComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
-        this.snackBar.open('✅ User deleted', 'Dismiss', { duration: 3000 });
+        this.notificationService.success('User deleted');
         this.loadUsers();
       },
       error: () => {
-        this.snackBar.open('❌ Failed to delete user', 'Dismiss', { duration: 3000 });
+        this.notificationService.error('Failed to delete user');
       }
     });
   }

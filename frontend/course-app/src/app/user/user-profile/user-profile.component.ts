@@ -18,6 +18,7 @@ import { NotificationService } from '../../service/notification.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserAdminService } from '../../service/user-admin.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { AuthService } from '../../service/auth.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -44,7 +45,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private profileService = inject(ProfileService);
   private adminService = inject(UserAdminService);
-  private notification = inject(NotificationService);
+  private authService = inject(AuthService);
+  private notificationService = inject(NotificationService);
   private dateAdapter = inject(DateAdapter<Date>);
 
   private destroy$ = new Subject<void>();
@@ -58,10 +60,10 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.dateAdapter.setLocale('en-CA'); // ensures yyyy-MM-dd format
 
-    this.userId = +this.route.snapshot.paramMap.get('id')!;
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
+        this.userId = +id;
         // Fetch user's profile by admin
         this.loadUser(+id);
       } else {
@@ -80,7 +82,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
           this.form = new User(user).toForm();
         },
         error: () => {
-          this.notification.error('Failed to load user information');
+          this.notificationService.error('Failed to load user information');
           this.router.navigate(['/users']);
         }
       });
@@ -95,7 +97,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
           this.form = new User(profile).toForm();
         },
         error: () => {
-          this.notification.error('Failed to load profile');
+          this.notificationService.error('Failed to load profile');
           this.router.navigate(['/users']);
         }
       });
@@ -115,18 +117,18 @@ export class UserProfileComponent implements OnInit, OnDestroy {
           next: profile => {
             this.profileData = profile;
             this.toggleEdit();
-            this.notification.success('User information updated successfully');
+            this.notificationService.success('User information updated successfully');
           },
-          error: err => this.notification.error('Failed to update profile')
+          error: err => this.notificationService.error('Failed to update profile')
         })
       } else {
         this.profileService.updateProfile(payload).subscribe({
           next: profile => {
             this.profileData = profile;
             this.toggleEdit();
-            this.notification.success('Profile updated successfully');
+            this.notificationService.success('Profile updated successfully');
           },
-          error: err => this.notification.error('Failed to update profile')
+          error: err => this.notificationService.error('Failed to update profile')
         })
       }
     }

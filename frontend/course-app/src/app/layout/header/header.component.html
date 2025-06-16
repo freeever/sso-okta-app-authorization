@@ -6,7 +6,7 @@
       <a class="btn btn-light btn-sm me-2" routerLink="/profile">My Profile</a>
 
       <!-- Role-based options (ADMIN / TEACHER / STUDENT) -->
-      <a class="btn btn-warning btn-sm me-2" *ngIf="isAdmin()" routerLink="/users">Users</a>
+      <a class="btn btn-light btn-sm me-2" *ngIf="canViewUsers()" routerLink="/users">Users</a>
       <a class="btn btn-light btn-sm me-2" routerLink="/courses">Courses</a>
 
       <!-- ✅ Logout button -->
