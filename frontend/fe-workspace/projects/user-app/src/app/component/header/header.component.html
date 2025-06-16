@@ -1,0 +1,25 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="/">Course Management</a>
+
+    <div class="d-flex ms-auto" *ngIf="isAuthenticated(); else guest">
+
+      <button type="button" class="btn btn-outline-light btn-sm me-2" (click)="gotoCourseManagement()">Course Management</button>
+
+      <a class="btn btn-light btn-sm me-2" routerLink="/profile">My Profile</a>
+
+      <!-- Role-based options (ADMIN / TEACHER / STUDENT) -->
+      <a class="btn btn-light btn-sm me-2" *ngIf="isAdmin()" routerLink="/users">Users</a>
+
+      <!-- ✅ Logout button -->
+      <button class="btn btn-outline-light btn-sm" (click)="logout()">Logout</button>
+
+      <!-- ✅ Hidden logout form -->
+      <form id="logoutForm" method="POST" action="{{logoutUrl}}" style="display: none;"></form>
+    </div>
+
+    <ng-template #guest>
+      <button class="btn btn-outline-light btn-sm" (click)="login()">Login</button>
+    </ng-template>
+  </div>
+</nav>

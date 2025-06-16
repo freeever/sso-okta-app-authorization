@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../service/auth.service';
 import { environment } from '../../../environments/environment';
@@ -14,9 +14,9 @@ import { URL_LOGIN } from '../../shared/core/urls';
 })
 export class HeaderComponent {
 
-  logoutUrl: string = `${environment.userBackendHost}/logout`;
+  private authService = inject(AuthService);
 
-  constructor(private authService: AuthService) {}
+  logoutUrl: string = `${environment.userBackendHost}/logout`;
 
   isAuthenticated() {
     return !!this.authService.profile;

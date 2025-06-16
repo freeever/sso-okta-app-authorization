@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.oidc.web.server.logout.OidcClientInitiatedServerLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.web.server.SecurityWebFilterChain;
@@ -21,8 +22,11 @@ import java.util.List;
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
-    @Value("${angular.redirect_url}")
-    private String angularRedirectUrl;
+    @Value("${client.redirect-url.user-app:}")
+    private String userAppRedirectUrl;
+
+    @Value("${client.redirect-url.course-app:}")
+    private String courseAppRedirectUrl;
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(
@@ -43,22 +47,42 @@ public class SecurityConfig {
     }
 
     private ServerAuthenticationSuccessHandler redirectToAngular() {
-        return new RedirectServerAuthenticationSuccessHandler(angularRedirectUrl);
+        return (exchange, authentication) -> {
+            String redirectUri = getClientRedirectUrl((OAuth2AuthenticationToken) authentication);
+
+            return new RedirectServerAuthenticationSuccessHandler(redirectUri)
+                    .onAuthenticationSuccess(exchange, authentication);
+        };
     }
 
     private ServerLogoutSuccessHandler oidcLogoutSuccessHandler(
             ReactiveClientRegistrationRepository clientRegistrationRepository) {
 
-        OidcClientInitiatedServerLogoutSuccessHandler handler =
-                new OidcClientInitiatedServerLogoutSuccessHandler(clientRegistrationRepository);
-        handler.setPostLogoutRedirectUri(String.valueOf(URI.create(angularRedirectUrl)));
-        return handler;
+        return (exchange, authentication) -> {
+            String redirectUri = getClientRedirectUrl((OAuth2AuthenticationToken) authentication);
+
+            OidcClientInitiatedServerLogoutSuccessHandler handler =
+                    new OidcClientInitiatedServerLogoutSuccessHandler(clientRegistrationRepository);
+            handler.setPostLogoutRedirectUri(String.valueOf(URI.create(redirectUri)));
+
+            return handler.onLogoutSuccess(exchange, authentication);
+        };
+    }
+
+    private String getClientRedirectUrl(OAuth2AuthenticationToken authentication) {
+        String client = authentication.getAuthorizedClientRegistrationId();
+
+        return switch (client) {
+            case "user-app" -> userAppRedirectUrl;
+            case "course-app" -> courseAppRedirectUrl;
+            default -> userAppRedirectUrl; // fallback
+        };
     }
 
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200"));
+        config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:4201"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // ✅ important for cookies/session-based auth

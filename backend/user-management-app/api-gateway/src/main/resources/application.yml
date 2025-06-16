@@ -80,5 +80,7 @@ eureka:
     prefer-ip-address: true
     hostname: localhost
 
-angular:
-  redirect_url: http://localhost:4200
+client:
+  redirect-url:
+    user-app: http://localhost:4200
+    course-app: http://localhost:4201
