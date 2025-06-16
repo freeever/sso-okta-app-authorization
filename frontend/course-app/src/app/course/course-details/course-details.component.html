@@ -47,12 +47,12 @@
 
       <mat-card-actions class="mt-4">
         <button mat-raised-button color="secondary" (click)="gotoList()" class="me-3">Back</button>
-        <button mat-raised-button color="primary" (click)="toggleEdit()">Edit</button>
+        <button mat-raised-button color="primary" *ngIf="canDedit()" (click)="toggleEdit()">Edit</button>
       </mat-card-actions>
     </mat-card>
   </div>
 
-  <div *ngIf="isEditing">
+  <div *ngIf="canDedit() && isEditing">
     <form [formGroup]="form" *ngIf="isEditing && form" (ngSubmit)="submit()">
       <div class="form-group col-md-6">
         <mat-form-field class="w-100" appearance="outline">

@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CourseService } from '../../service/course.service';
 import { AuthService } from '../../service/auth.service';
 import { CommonModule } from '@angular/common';
@@ -12,6 +11,7 @@ import { Course } from '../../model/course.model';
 import { Subject, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../shared/component/confirm-dialog/confirm-dialog.component';
+import { NotificationService } from '../../service/notification.service';
 
 @Component({
   selector: 'app-course-list',
@@ -36,7 +36,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
 
   constructor(private courseService: CourseService,
               private authService: AuthService,
-              private snackBar: MatSnackBar,
+              private notificationService: NotificationService,
               private router: Router,
               private dialog: MatDialog
   ) {}
@@ -52,7 +52,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
         this.isLoading = false;
       },
       error: () => {
-        this.snackBar.open('Failed to load courses.', 'Dismiss', { duration: 3000 });
+        this.notificationService.error('Failed to load courses.');
         this.isLoading = false;
       }
     });
@@ -81,11 +81,11 @@ export class CourseListComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
-        this.snackBar.open('✅ Course deleted', 'Dismiss', { duration: 3000 });
+        this.notificationService.success('Course deleted');
         this.loadCourses();
       },
       error: () => {
-        this.snackBar.open('❌ Failed to delete course', 'Dismiss', { duration: 3000 });
+        this.notificationService.error('Failed to delete course');
       }
     });
   }

@@ -14,5 +14,5 @@ export const routes: Routes = [
   { path: 'users', component: UserListComponent, canActivate: [ AuthGuard, RoleGurad ], data: { roles: ['ADMIN']} },
   { path: 'users/:id', component: UserProfileComponent, canActivate: [ AuthGuard, RoleGurad ], data: { roles: ['ADMIN', "TEACHER"]} },
   { path: 'courses', component: CourseListComponent, canActivate: [ AuthGuard ] },
-  { path: 'courses/:id', component: CourseDetailsComponent, canActivate: [ AuthGuard, RoleGurad ], data: { roles: ['ADMIN']} }
+  { path: 'courses/:id', component: CourseDetailsComponent, canActivate: [ AuthGuard ] }
 ];

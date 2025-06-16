@@ -17,10 +17,14 @@
         </div>
       <div class="col-md-6 mt-2 mb-2  "><strong>Role:</strong> {{ role?.value }}</div>
     </div>
-    <button mat-raised-button color="primary" (click)="toggleEdit()">Edit</button>
+
+    <div class="col-12 d-flex justify-content-start gap-2">
+      <button mat-raised-button *ngIf="userId" type="button" (click)="gotoList()">Back</button>
+      <button mat-raised-button color="primary" *ngIf="canEdit()" (click)="toggleEdit()">Edit</button>
+    </div>
   </div>
 
-  <form *ngIf="isEditMode" [formGroup]="form" (ngSubmit)="submit()" class="row g-3">
+  <form *ngIf="canEdit() && isEditMode" [formGroup]="form" (ngSubmit)="submit()" class="row g-3">
     <div class="col-md-6">
       <mat-form-field appearance="outline" class="w-100">
         <mat-label>First Name</mat-label>

@@ -22,8 +22,8 @@ export class HeaderComponent {
     return !!this.authService.profile;
   }
 
-  isAdmin() {
-    return this.authService.profile?.role === Role.ADMIN;
+  canViewUsers() {
+    return this.authService.isAdmin() || this.authService.isTeacher();
   }
 
   login(): void {
