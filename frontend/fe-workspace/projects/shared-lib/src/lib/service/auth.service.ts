@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, map, mapTo, Observable, of, shareReplay, tap } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
 import { User } from '../model/user.model';
 import { ProfileService } from './profile.service';
 import { Role } from '../core/role.enum';
@@ -18,38 +17,60 @@ export class AuthService {
     return this._profile;
   }
 
-  constructor(private profileService: ProfileService, private router: Router) {
-  }
+  constructor(private profileService: ProfileService) {}
 
-  checkAuthentication(): void {
-    this.profileService.getProfile().subscribe({
-      next: (user) => {
+  private checkInProgress$: Observable<boolean> | null = null;
+
+  checkAuthentication(): Observable<boolean> {
+    // ✅ If already authenticated, return true immediately
+    if (this.authenticated.value === true) {
+      return of(true);
+    }
+
+    // ✅ If already checking, return the same observable
+    if (this.checkInProgress$) {
+      return this.checkInProgress$;
+    }
+
+    // 🔄 Otherwise, perform check and cache it
+    const check$ = this.profileService.getProfile().pipe(
+      tap(user => {
         this._profile = user;
         this.authenticated.next(true);
-      },
-      error: (error: HttpErrorResponse) => {
+      }),
+      map(() => true),
+      catchError((error: HttpErrorResponse) => {
         if (error.status === 404) {
-          // Profile not found → try creating it
-          this.profileService.createProfile().subscribe({
-            next: (createdUser) => {
+          // Try creating profile
+          return this.profileService.createProfile().pipe(
+            tap(createdUser => {
               this._profile = createdUser;
               this.authenticated.next(true);
-              this.router.navigate(['/']); // redirect to home after profile creation
-            },
-            error: (err) => {
+            }),
+            map(() => true),
+              catchError(err => {
+              console.error('❌ Failed to create profile', err);
               this._profile = null;
               this.authenticated.next(false);
-              console.error('❌ Failed to create profile', err);
-              this.router.navigate(['/']); // still redirect to home
-            }
-          });
+              return of(false);
+            })
+          );
         } else {
+          console.error('❌ Failed to load profile', error);
           this._profile = null;
           this.authenticated.next(false);
-          console.error('❌ Failed to load profile', error);
+          return of(false);
         }
-      }
-    });
+      }),
+      finalize(() => {
+        // 🚫 Clear cache after first run completes
+        this.checkInProgress$ = null;
+      }),
+      shareReplay(1) // 🔁 Reuse the result for all subscribers
+    );
+
+    this.checkInProgress$ = check$;
+    return check$;
   }
 
   isAdmin() {

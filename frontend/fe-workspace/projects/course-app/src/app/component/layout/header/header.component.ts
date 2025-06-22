@@ -1,8 +1,10 @@
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { URL_LOGIN, URL_LOGOUT } from '../../../core/urls';
+import { Subject, takeUntil } from 'rxjs';
+
 import { AuthService } from 'shared-lib';
+import { URL_LOGIN, URL_LOGOUT } from '../../../core/urls';
 
 @Component({
   selector: 'app-header',
@@ -10,18 +12,24 @@ import { AuthService } from 'shared-lib';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit, OnDestroy {
 
   private authService = inject(AuthService);
 
   logoutUrl: string = URL_LOGOUT;
 
-  isAuthenticated() {
-    return !!this.authService.profile;
+  private destroy$ = new Subject<void>();
+  isAuthenticated$ = this.authService.isAuthenticated$;
+
+  ngOnInit(): void {
+    this.authService.checkAuthentication()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe();
   }
 
-  gotoUserManagement() {
-    window.location.href = "http://localhost:4200";
+  redirectToUserApp(targetPath: string): string {
+    const encodedRedirectTo = encodeURIComponent(targetPath);
+    return `http://localhost:9001/custom-login/user-app?redirectTo=${encodedRedirectTo}`;
   }
 
   login(): void {
@@ -31,5 +39,10 @@ export class HeaderComponent {
   logout(): void {
     const form = document.getElementById('logoutForm') as HTMLFormElement;
     form?.submit(); // ✅ Spring handles the logout, redirect, and session invalidation
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

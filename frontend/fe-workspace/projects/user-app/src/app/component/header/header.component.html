@@ -2,9 +2,9 @@
   <div class="container-fluid">
     <a class="navbar-brand" routerLink="/">Course Management</a>
 
-    <div class="d-flex ms-auto" *ngIf="isAuthenticated(); else guest">
+    <div class="d-flex ms-auto" *ngIf="isAuthenticated$ | async; else guest">
 
-      <button type="button" class="btn btn-outline-light btn-sm me-2" (click)="gotoCourseManagement()">Course Management</button>
+      <a class="btn btn-light btn-sm me-2" [href]="redirectToCourseApp('/courses')">Course Management</a>
 
       <a class="btn btn-light btn-sm me-2" routerLink="/profile">My Profile</a>
 
@@ -13,7 +13,6 @@
 
       <!-- ✅ Logout button -->
       <button class="btn btn-outline-light btn-sm" (click)="logout()">Logout</button>
-
       <!-- ✅ Hidden logout form -->
       <form id="logoutForm" method="POST" action="{{logoutUrl}}" style="display: none;"></form>
     </div>

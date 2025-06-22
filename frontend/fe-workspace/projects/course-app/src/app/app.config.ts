@@ -7,12 +7,12 @@ import { MatNativeDateModule } from '@angular/material/core';
 
 import { routes } from './app.routes';
 import { AppInterceptor, DateFormatProvider, SHARED_LIB_CONFIG, SharedLibConfig } from 'shared-lib';
-import { URL_LOGIN, URL_PROFILE_API } from './core/urls';
+import { URL_LOGIN, URL_PROFILE_API, URL_USERS_API } from './core/urls';
 
 const sharedLibConfig: SharedLibConfig = {
   loginUrl: URL_LOGIN,
   profileApiUrl: URL_PROFILE_API,
-  usersApiUrl: ''
+  usersApiUrl: URL_USERS_API
 }
 
 export const appConfig: ApplicationConfig = {

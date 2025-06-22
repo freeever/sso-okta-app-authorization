@@ -1,5 +1,6 @@
 package com.dxu.sso.api.gateway.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,10 +15,12 @@ import org.springframework.security.web.server.authentication.ServerAuthenticati
 import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.web.server.ServerWebExchange;
 
 import java.net.URI;
 import java.util.List;
 
+@Slf4j
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
@@ -48,10 +51,26 @@ public class SecurityConfig {
 
     private ServerAuthenticationSuccessHandler redirectToAngular() {
         return (exchange, authentication) -> {
-            String redirectUri = getClientRedirectUrl((OAuth2AuthenticationToken) authentication);
+            ServerWebExchange webExchange = exchange.getExchange();
 
-            return new RedirectServerAuthenticationSuccessHandler(redirectUri)
-                    .onAuthenticationSuccess(exchange, authentication);
+            String defaultRedirect = getClientRedirectUrl((OAuth2AuthenticationToken) authentication);
+
+            return webExchange.getSession().flatMap(session -> {
+                String redirectTo = (String) session.getAttributes().get("redirectTo");
+                log.info("Redirecting to {}", redirectTo);
+
+                // Clear it from session after use
+                session.getAttributes().remove("redirectTo");
+
+                String finalRedirect = (redirectTo != null && !redirectTo.isBlank())
+                        ? defaultRedirect + redirectTo
+                        : defaultRedirect;
+
+                RedirectServerAuthenticationSuccessHandler handler =
+                        new RedirectServerAuthenticationSuccessHandler(finalRedirect);
+
+                return handler.onAuthenticationSuccess(exchange, authentication);
+            });
         };
     }
 

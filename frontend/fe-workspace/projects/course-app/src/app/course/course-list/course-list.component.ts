@@ -92,7 +92,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
     this.router.navigate(['/courses/new']);
   }
 
-  isAdmin(): boolean {
+  get isAdmin(): boolean {
     return this.authService.isAdmin();
   }
 

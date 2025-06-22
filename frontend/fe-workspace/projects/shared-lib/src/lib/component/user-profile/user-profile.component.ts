@@ -148,7 +148,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   }
 
   canEdit() {
-    return this.authService.isAdmin();
+    return !this.userId || this.authService.isAdmin();
   }
 
   gotoList(): void {

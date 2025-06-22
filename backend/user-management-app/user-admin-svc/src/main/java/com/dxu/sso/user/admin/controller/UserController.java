@@ -27,7 +27,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @RequireRoles({"ADMIN", "TEACHER"})
+    @RequireRoles({"ADMIN", "TEACHER", "STUDENT"})
     @GetMapping("/{id}")
     public ResponseEntity<AppUserDto> findById(@PathVariable Long id) throws SsoApplicationException {
         log.info("get user by id: {}", id);
@@ -36,7 +36,7 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @RequireRoles({"ADMIN", "TEACHER"})
+    @RequireRoles({"ADMIN", "TEACHER", "STUDENT"})
     @GetMapping
     public List<AppUserDto> findAll() {
         log.info("find all users");
