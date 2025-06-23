@@ -11,6 +11,9 @@ export class AuthService {
   private authenticated = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.authenticated.asObservable();
 
+  private loadingSubject = new BehaviorSubject<boolean>(true);
+  public loading$ = this.loadingSubject.asObservable();
+
   private _profile!: User | null;
 
   public get profile() {
@@ -65,6 +68,7 @@ export class AuthService {
       finalize(() => {
         // 🚫 Clear cache after first run completes
         this.checkInProgress$ = null;
+        this.loadingSubject.next(false); // 👈 done loading
       }),
       shareReplay(1) // 🔁 Reuse the result for all subscribers
     );

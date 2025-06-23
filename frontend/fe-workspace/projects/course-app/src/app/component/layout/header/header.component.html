@@ -1,24 +1,33 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-  <div class="container-fluid">
-    <a class="navbar-brand" routerLink="/">Course Management</a>
-
-    <div class="d-flex ms-auto" *ngIf="isAuthenticated$ | async; else guest">
-
-      <a class="btn btn-light btn-sm me-2" [href]="redirectToUserApp('/profile')">User Management</a>
-
-      <a class="btn btn-light btn-sm me-2" routerLink="/profile">My Profile</a>
-
-      <!-- Role-based options (ADMIN / TEACHER / STUDENT) -->
-      <a class="btn btn-light btn-sm me-2" routerLink="/courses">Courses</a>
-
-      <!-- ✅ Logout button -->
-      <button class="btn btn-outline-light btn-sm" (click)="logout()">Logout</button>
-      <!-- ✅ Hidden logout form -->
-      <form id="logoutForm" method="POST" action="{{logoutUrl}}" style="display: none;"></form>
-    </div>
-
-    <ng-template #guest>
-      <button class="btn btn-outline-light btn-sm" (click)="login()">Login</button>
-    </ng-template>
+<ng-container *ngIf="loading$ | async as loading; else header">
+  <div class="d-flex ms-auto">
+    <span class="text-white me-2">Loading...</span>
+    <div class="spinner-border text-light spinner-border-sm" role="status"></div>
   </div>
-</nav>
+</ng-container>
+
+<ng-template #header>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand" routerLink="/">Course Management</a>
+
+      <div class="d-flex ms-auto" *ngIf="isAuthenticated$ | async; else guest">
+
+        <a class="btn btn-light btn-sm me-2" [href]="redirectToUserApp('/profile')">User Management</a>
+
+        <a class="btn btn-light btn-sm me-2" routerLink="/profile">My Profile</a>
+
+        <!-- Role-based options (ADMIN / TEACHER / STUDENT) -->
+        <a class="btn btn-light btn-sm me-2" routerLink="/courses">Courses</a>
+
+        <!-- ✅ Logout button -->
+        <button class="btn btn-outline-light btn-sm" (click)="logout()">Logout</button>
+        <!-- ✅ Hidden logout form -->
+        <form id="logoutForm" method="POST" action="{{logoutUrl}}" style="display: none;"></form>
+      </div>
+
+      <ng-template #guest>
+        <button class="btn btn-outline-light btn-sm" (click)="login()">Login</button>
+      </ng-template>
+    </div>
+  </nav>
+</ng-template>
