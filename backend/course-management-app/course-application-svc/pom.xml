@@ -8,11 +8,11 @@
         <version>3.4.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.dxu.sso.course.registration</groupId>
-    <artifactId>course-registration-svc</artifactId>
+    <groupId>com.dxu.sso.course.application</groupId>
+    <artifactId>course-application-svc</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>course-registration-svc</name>
-    <description>course-registration-svc</description>
+    <name>course-application-svc</name>
+    <description>course-application-svc</description>
 
     <properties>
         <java.version>17</java.version>

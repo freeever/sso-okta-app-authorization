@@ -42,10 +42,10 @@ spring:
           filters:
             - TokenRelay
 
-        - id: course-registration
-          uri: lb://course-registration-svc
+        - id: course-application
+          uri: lb://course-application-svc
           predicates:
-            - Path=/api/registrations/**
+            - Path=/api/applications/**
           filters:
             - TokenRelay
 

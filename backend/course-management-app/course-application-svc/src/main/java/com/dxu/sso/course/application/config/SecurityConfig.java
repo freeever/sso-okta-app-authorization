@@ -1,4 +1,4 @@
-package com.dxu.sso.course.registration.config;
+package com.dxu.sso.course.application.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
