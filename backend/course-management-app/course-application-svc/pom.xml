@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.dxu.sso.course.registration</groupId>
-    <artifactId>course-registration-svc</artifactId>
+    <artifactId>course-application-svc</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>course-registration-svc</name>
     <description>course-registration-svc</description>
