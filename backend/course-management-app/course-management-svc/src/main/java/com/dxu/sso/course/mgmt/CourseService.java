@@ -7,6 +7,8 @@ import com.dxu.sso.common.dto.user.AppUserDto;
 import com.dxu.sso.common.exception.SsoApplicationException;
 import com.dxu.sso.common.integration.UserWebClient;
 import com.dxu.sso.common.model.course.Course;
+import com.dxu.sso.common.model.course.CourseEnrollment;
+import com.dxu.sso.common.model.course.CourseEnrollmentId;
 import com.dxu.sso.course.mgmt.repository.CourseEnrollmentRepository;
 import com.dxu.sso.course.mgmt.repository.CourseRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -42,7 +45,20 @@ public class CourseService {
         course.setStartDate(request.getStartDate());
         course.setEndDate(request.getEndDate());
         course.setTeacherId(request.getTeacherId());
-        course.setEnrolledStudentIds(request.getEnrolledStudentIds());
+
+        // 💥 Rebuild enrollment list
+        List<CourseEnrollment> newEnrollments = request.getEnrolledStudentIds() != null
+                ? request.getEnrolledStudentIds().stream()
+                .map(studentId -> CourseEnrollment.builder()
+                        .id(new CourseEnrollmentId(course.getId(), studentId))
+                        .course(course)
+                        .build())
+                .toList()
+                : new ArrayList<>();
+
+        // ⚠️ Clear and replace enrollments
+        course.getEnrollments().clear();
+        course.getEnrollments().addAll(newEnrollments);
 
         Course updated = courseRepository.save(course);
         return getCourseDetails(updated);
@@ -53,13 +69,17 @@ public class CourseService {
         courseRepository.deleteById(id);
     }
 
-    private CourseDetailsDto getCourseDetails(Course saved) {
+    private CourseDetailsDto getCourseDetails(Course course) {
         // Fetch teacher
-        AppUserDto teacher = saved.getTeacherId() != null ? userWebClient.getUserById(saved.getTeacherId()) : null;
-        // Fetch students
-        List<AppUserDto> students = userWebClient.getUsersByIds(saved.getEnrolledStudentIds());
+        AppUserDto teacher = course.getTeacherId() != null ? userWebClient.getUserById(course.getTeacherId()) : null;
+        List<Long> studentIds = course.getEnrollments().stream()
+                .map(e -> e.getId().getStudentId())
+                .toList();
 
-        return courseMapper.toDetailsDto(saved, teacher, students);
+        // Fetch students
+        List<AppUserDto> students = userWebClient.getUsersByIds(studentIds);
+
+        return courseMapper.toDetailsDto(course, teacher, students);
     }
 
 }

@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long>  {
 
-    @Query(value = "SELECT student_id FROM course_enrollment WHERE course_id = :courseId", nativeQuery = true)
-    List<Long> findStudentIdsByCourseId(@Param("courseId") Long courseId);
+    @Query("SELECT c FROM Course c LEFT JOIN FETCH c.enrollments")
+    List<Course> findAllWithEnrollments();
 
 }

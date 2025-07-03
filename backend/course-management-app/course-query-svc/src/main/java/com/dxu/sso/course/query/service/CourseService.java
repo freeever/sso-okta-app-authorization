@@ -7,6 +7,7 @@ import com.dxu.sso.common.dto.user.AppUserDto;
 import com.dxu.sso.common.exception.SsoApplicationException;
 import com.dxu.sso.common.model.course.Course;
 import com.dxu.sso.common.integration.UserWebClient;
+import com.dxu.sso.common.model.course.CourseEnrollment;
 import com.dxu.sso.course.query.repository.CourseRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,7 @@ public class CourseService {
     private final UserWebClient userWebClient;
 
     public List<CourseDto> findAll() throws SsoApplicationException {
-        List<Course> courses = courseRepo.findAll();
+        List<Course> courses = courseRepo.findAllWithEnrollments();
 
         List<Long> teacherIds = courses.stream().map(Course::getTeacherId).toList();
         List<AppUserDto> teachers = userWebClient.getUsersByIds(teacherIds);
@@ -46,7 +47,9 @@ public class CourseService {
         // Fetch teacher
         AppUserDto teacher = course.getTeacherId() != null ? userWebClient.getUserById(course.getTeacherId()) : null;
         // Fetch students
-        List<AppUserDto> students = userWebClient.getUsersByIds(course.getEnrolledStudentIds());
+        List<AppUserDto> students = userWebClient.getUsersByIds(course.getEnrollments().stream()
+                .map(CourseEnrollment::getStudentId)
+                .collect(Collectors.toList()));
 
         return courseMapper.toDetailsDto(course, teacher, students);
     }

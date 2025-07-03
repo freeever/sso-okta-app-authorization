@@ -1,13 +1,12 @@
 package com.dxu.sso.common.model.course;
 
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -40,8 +39,6 @@ public class Course {
     @JoinColumn(name = "teacher_id")
     private Long teacherId;    // FK reference to AppUser.id (role=TEACHER)
 
-    @ElementCollection
-    @CollectionTable(name = "course_enrollment", schema = "ssocourse", joinColumns = @JoinColumn(name = "course_id"))
-    @Column(name = "student_id")
-    private List<Long> enrolledStudentIds = new ArrayList<>();
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CourseEnrollment> enrollments = new ArrayList<>();
 }
