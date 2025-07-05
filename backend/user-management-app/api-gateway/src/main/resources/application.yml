@@ -45,7 +45,7 @@ spring:
         - id: course-application
           uri: lb://course-application-svc
           predicates:
-            - Path=/api/applications/**
+            - Path=/api/course-application/**
           filters:
             - TokenRelay
 

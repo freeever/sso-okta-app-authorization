@@ -13,8 +13,8 @@ spring:
           issuer-uri: https://dev-50623690.okta.com/oauth2/default
 
   datasource:
-    url: jdbc:mysql://localhost:3306/ssocourse
-    username: ssocourse
+    url: jdbc:mysql://localhost:3306/ssocourseapp
+    username: ssocourseapp
     password: passw0rd
 
   jpa:
@@ -36,3 +36,5 @@ url:
   user:
     profile: http://localhost:9002/api/profile/me
     admin: http://localhost:9003/api/admin/users
+  course:
+    query: http://localhost:9012/api/courses

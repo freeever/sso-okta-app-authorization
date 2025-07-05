@@ -9,8 +9,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @SpringBootApplication
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EntityScan(basePackages = {
-        "com.dxu.sso.common.model.course",       // 👈 include shared Course entity
-        "com.dxu.sso.course.application.model"  // if you have your own entities
+        "com.dxu.sso.common.model.courseapp",
 })
 @ComponentScan(basePackages = {
         "com.dxu.sso.course.application",

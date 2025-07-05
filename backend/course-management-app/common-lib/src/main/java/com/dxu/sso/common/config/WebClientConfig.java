@@ -13,4 +13,10 @@ public class WebClientConfig {
     public WebClient.Builder userWebClientBuilder() {
         return WebClient.builder();
     }
+
+    @Bean
+    @Qualifier("courseWebClientBuilder")
+    public WebClient.Builder courseWebClientBuilder() {
+        return WebClient.builder();
+    }
 }

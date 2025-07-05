@@ -1,6 +1,7 @@
 package com.dxu.sso.common.integration;
 
 import com.dxu.sso.common.dto.user.AppUserDto;
+import com.dxu.sso.common.security.SecurityUtil;
 import com.dxu.sso.common.security.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,11 +27,14 @@ public class UserWebClient {
     @Value("${url.user.admin:}")
     private String userAdminUrl;
 
+    private final SecurityUtil securityUtil;
     private final WebClient.Builder webClientBuilder;
     private final UserContext userContext;
 
-    public UserWebClient(@Qualifier("userWebClientBuilder") WebClient.Builder webClientBuilder,
+    public UserWebClient(SecurityUtil securityUtil,
+                         @Qualifier("userWebClientBuilder") WebClient.Builder webClientBuilder,
                          UserContext userContext) {
+        this.securityUtil = securityUtil;
         this.webClientBuilder = webClientBuilder;
         this.userContext = userContext;
     }
@@ -50,7 +54,7 @@ public class UserWebClient {
         AppUserDto user = webClientBuilder.build()
                 .get()
                 .uri(userProfileUrl)
-                .header(HttpHeaders.AUTHORIZATION, getAuthHeader())
+                .header(HttpHeaders.AUTHORIZATION, securityUtil.getAuthHeader())
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.empty())
                 .bodyToMono(AppUserDto.class)
@@ -66,7 +70,7 @@ public class UserWebClient {
         return webClientBuilder.build()
                 .get()
                 .uri(userAdminUrl + "/" + id)
-                .header(HttpHeaders.AUTHORIZATION, getAuthHeader())
+                .header(HttpHeaders.AUTHORIZATION, securityUtil.getAuthHeader())
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.empty())
                 .bodyToMono(AppUserDto.class)
@@ -79,7 +83,7 @@ public class UserWebClient {
         return webClientBuilder.build()
                 .post()
                 .uri(userAdminUrl + "/batch")
-                .header(HttpHeaders.AUTHORIZATION, getAuthHeader())
+                .header(HttpHeaders.AUTHORIZATION, securityUtil.getAuthHeader())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(ids)
                 .retrieve()
@@ -88,13 +92,4 @@ public class UserWebClient {
                 .collectList()
                 .block();
     }
-
-    private static String getAuthHeader() {
-        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attrs == null) return null;
-
-        String authHeader = attrs.getRequest().getHeader(HttpHeaders.AUTHORIZATION);
-        return authHeader == null || !authHeader.startsWith("Bearer ") ? null : authHeader;
-    }
-
 }

@@ -8,6 +8,7 @@ import com.dxu.sso.common.exception.SsoApplicationException;
 import com.dxu.sso.common.model.course.Course;
 import com.dxu.sso.common.integration.UserWebClient;
 import com.dxu.sso.common.model.course.CourseEnrollment;
+import com.dxu.sso.common.dto.course.CourseQueryRequest;
 import com.dxu.sso.course.query.repository.CourseRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,10 @@ public class CourseService {
     private final CourseMapper courseMapper;
     private final UserWebClient userWebClient;
 
+    /**
+     * Get all courses
+     * @return course list
+     */
     public List<CourseDto> findAll() throws SsoApplicationException {
         List<Course> courses = courseRepo.findAllWithEnrollments();
 
@@ -40,7 +45,12 @@ public class CourseService {
         return toCourseDtoList(courses, teachers);
     }
 
-    public CourseDetailsDto getCourseDetails(Long id) {
+    /**
+     * Fetch course details by id
+     * @param id course id
+     * @return course details
+     */
+    public CourseDetailsDto findCourseDetails(Long id) {
         Course course = courseRepo.findById(id)
                 .orElseThrow(() -> new SsoApplicationException(HttpStatus.BAD_REQUEST.value(), "Course not found"));
 
@@ -52,6 +62,18 @@ public class CourseService {
                 .collect(Collectors.toList()));
 
         return courseMapper.toDetailsDto(course, teacher, students);
+    }
+
+    /**
+     * Fetch courses by ids
+     * @param request request payload
+     * @return course list
+     */
+    public List<CourseDto> findCoursesByIds(CourseQueryRequest request) {
+        log.info("find courses by ids: {}", request.getCourseIds());
+
+        List<Course> courses = courseRepo.findByIdIn(request.getCourseIds());
+        return courses.stream().map(courseMapper::toDto).collect(Collectors.toList());
     }
 
     private List<CourseDto> toCourseDtoList(List<Course> courses, List<AppUserDto> teachers) {
