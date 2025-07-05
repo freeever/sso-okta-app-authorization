@@ -206,21 +206,11 @@ public class CourseApplicationService {
             return List.of();
         }
 
-        // Step 1: Extract IDs
-        List<Long> userIds = getAllUserIds(applications);
-        List<Long> courseIds = getCourseIds(applications);
+        // 1: Get data for enrich
+        Map<Long, AppUserDto> userMap = getUsers(applications);
+        Map<Long, CourseDto> courseMap = getCourses(applications);
 
-        // Step 2: Fetch data
-        List<AppUserDto> users = userWebClient.getUsersByIds(userIds);
-        List<CourseDto> courses = courseWebClient.findCoursesByIds(courseIds);
-
-        // Step 3: Map by ID
-        Map<Long, AppUserDto> userMap = users.stream()
-                .collect(Collectors.toMap(AppUserDto::getId, Function.identity()));
-        Map<Long, CourseDto> courseMap = courses.stream()
-                .collect(Collectors.toMap(CourseDto::getId, Function.identity()));
-
-        // Step 4: Enrich applications
+        // 2: Enrich applications
         for (CourseApplicationDto application : applications) {
             enrichApplication(application, userMap, courseMap);
         }
@@ -229,12 +219,44 @@ public class CourseApplicationService {
     }
 
     /**
+     * Retrieve all the related users (student, reviewer), if exist
+     * @param applications course applications
+     * @return user list
+     */
+    private Map<Long, AppUserDto> getUsers(List<CourseApplicationDto> applications) {
+        // Step 1: Extract IDs
+        List<Long> userIds = getAllUserIds(applications);
+        // Step 2: Fetch data
+        List<AppUserDto> users = userWebClient.getUsersByIds(userIds);
+
+        // Step 3: Map by ID
+        return users.stream()
+                .collect(Collectors.toMap(AppUserDto::getId, Function.identity()));
+    }
+
+    /**
+     * Retrieve all the related users (student, reviewer), if exist
+     * @param applications course applications
+     * @return user list
+     */
+    private Map<Long, CourseDto> getCourses(List<CourseApplicationDto> applications) {
+        // Step 1: Extract IDs
+        List<Long> courseIds = getCourseIds(applications);
+        // Step 2: Fetch data
+        List<CourseDto> courses = courseWebClient.findCoursesByIds(courseIds);
+
+        // Step 3: Map by ID
+        return courses.stream()
+                .collect(Collectors.toMap(CourseDto::getId, Function.identity()));
+    }
+
+    /**
      * Given the fetch data for enrichment, populate all the available necessary application details
      * @param application the course application
      * @param userMap the map of all related users (student and/or reviewer)
      * @param courseMap the map of courses
      */
-    private static void enrichApplication(CourseApplicationDto application, Map<Long, AppUserDto> userMap, Map<Long, CourseDto> courseMap) {
+    private void enrichApplication(CourseApplicationDto application, Map<Long, AppUserDto> userMap, Map<Long, CourseDto> courseMap) {
         AppUserDto student = userMap.get(application.getStudentId());
         if (student != null) {
             application.setStudentFirstName(student.getFirstName());
