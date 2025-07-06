@@ -40,7 +40,7 @@ public class CourseService {
         List<Course> courses = courseRepo.findAllWithEnrollments();
 
         List<Long> teacherIds = courses.stream().map(Course::getTeacherId).toList();
-        List<AppUserDto> teachers = userWebClient.getUsersByIds(teacherIds);
+        List<AppUserDto> teachers = userWebClient.getUsersByIds(teacherIds).collectList().block();
 
         return toCourseDtoList(courses, teachers);
     }
@@ -55,11 +55,13 @@ public class CourseService {
                 .orElseThrow(() -> new SsoApplicationException(HttpStatus.BAD_REQUEST.value(), "Course not found"));
 
         // Fetch teacher
-        AppUserDto teacher = course.getTeacherId() != null ? userWebClient.getUserById(course.getTeacherId()) : null;
+        AppUserDto teacher = course.getTeacherId() != null ? userWebClient.getUserById(course.getTeacherId()).block() : null;
         // Fetch students
-        List<AppUserDto> students = userWebClient.getUsersByIds(course.getEnrollments().stream()
+        List<Long> studentIds = course.getEnrollments().stream()
                 .map(CourseEnrollment::getStudentId)
-                .collect(Collectors.toList()));
+                .toList();
+
+        List<AppUserDto> students = userWebClient.getUsersByIds(studentIds).collectList().block();
 
         return courseMapper.toDetailsDto(course, teacher, students);
     }

@@ -9,18 +9,18 @@ import com.dxu.sso.common.integration.CourseWebClient;
 import com.dxu.sso.common.integration.UserWebClient;
 import com.dxu.sso.common.model.CourseApplicationStatus;
 import com.dxu.sso.common.model.courseapp.CourseApplication;
-import com.dxu.sso.course.application.repository.CourseApplicationRepository;
+import com.dxu.sso.course.application.repository.ReactiveCourseApplicationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.dxu.sso.common.model.CourseApplicationStatus.APPROVED;
 import static com.dxu.sso.common.model.CourseApplicationStatus.CANCELLED;
@@ -34,7 +34,7 @@ public class CourseApplicationService {
 
     private final UserWebClient userWebClient;
     private final CourseWebClient courseWebClient;
-    private final CourseApplicationRepository repository;
+    private final ReactiveCourseApplicationRepository repository;
     private final CourseApplicationMapper mapper;
 
     /**
@@ -43,11 +43,12 @@ public class CourseApplicationService {
      * @param status course application status
      * @return List of the applications for the given course and status
      */
-    public List<CourseApplicationDto> findByCourseAndStatus(Long courseId, CourseApplicationStatus status) {
+    public Flux<CourseApplicationDto> findByCourseAndStatus(Long courseId, CourseApplicationStatus status) {
         log.info("find applications by courseId: {} status: {}", courseId, status);
 
-        List<CourseApplication> applications = repository.findByCourseIdAndStatus(courseId, status);
-        return populateApplicationsInfo(applications);
+        return repository.findByCourseIdAndStatus(courseId, status)
+                .collectList()
+                .flatMapMany(this::populateApplicationsInfo);
     }
 
     /**
@@ -55,11 +56,13 @@ public class CourseApplicationService {
      * @param studentId student id
      * @return List of the applications for the given student
      */
-    public List<CourseApplicationDto> findByStudentId(Long studentId) {
+    public Flux<CourseApplicationDto> findByStudentId(Long studentId) {
         log.info("find applications by studentId: {}", studentId);
 
-        List<CourseApplication> applications = repository.findByStudentId(studentId);
-        return populateApplicationsInfo(applications);
+        return repository.findByStudentId(studentId)
+                .collectList()
+                .flatMapMany(this::populateApplicationsInfo);
+        // returns Flux<CourseApplicationDto>
     }
 
     /**
@@ -68,11 +71,12 @@ public class CourseApplicationService {
      * @param courseId course id
      * @return List of the applications for the given course and student
      */
-    public List<CourseApplicationDto> findByStudentAndCourse(Long studentId, Long courseId) {
+    public Flux<CourseApplicationDto> findByStudentAndCourse(Long studentId, Long courseId) {
         log.info("find applications by studentId: {} and courseId: {}", studentId, courseId);
 
-        List<CourseApplication> applications = repository.findByStudentIdAndCourseId(studentId, courseId);
-        return populateApplicationsInfo(applications);
+        return repository.findByStudentIdAndCourseId(studentId, courseId)
+                .collectList()
+                .flatMapMany(this::populateApplicationsInfo);
     }
 
     /**
@@ -81,25 +85,27 @@ public class CourseApplicationService {
      * @param studentId the student id
      * @return the created course application
      */
-    public CourseApplicationDto apply(Long courseId, Long studentId) {
+    public Mono<CourseApplicationDto> apply(Long courseId, Long studentId) {
         log.info("apply courseId: {} studentId: {}", courseId, studentId);
 
-        boolean exists = repository.existsByStudentIdAndCourseIdAndStatusIn(
-                studentId, courseId, List.of(PENDING, IN_PROGRESS, APPROVED));
-        if (exists) {
-            throw new SsoApplicationException(HttpStatus.BAD_REQUEST.value(),
-                    "You already have a pending/in-progress/approved application for this course.");
-        }
+        return repository.existsByStudentIdAndCourseIdAndStatusIn(
+                        studentId, courseId, List.of(PENDING, IN_PROGRESS, APPROVED))
+                .flatMap(exists -> {
+                    if (exists) {
+                        return Mono.error(new SsoApplicationException(HttpStatus.BAD_REQUEST.value(),
+                                "You already have a pending/in-progress/approved application for this course."));
+                    }
 
-        CourseApplication application = CourseApplication.builder()
-                .courseId(courseId)
-                .studentId(studentId)
-                .status(PENDING)
-                .createdAt(LocalDateTime.now())
-                .build();
+                    CourseApplication application = CourseApplication.builder()
+                            .courseId(courseId)
+                            .studentId(studentId)
+                            .status(PENDING)
+                            .createdAt(LocalDateTime.now())
+                            .build();
 
-        application = repository.save(application);
-        return populateApplicationsInfo(List.of(application)).get(0);
+                    return repository.save(application); // returns Mono<CourseApplication>
+                })
+                .flatMap(savedApp -> populateApplicationsInfo(List.of(savedApp)).next());
     }
 
     /**
@@ -108,23 +114,24 @@ public class CourseApplicationService {
      * @param studentId the student id
      * @return the cancelled course application
      */
-    public CourseApplicationDto cancel(Long applicationId, Long studentId) {
+    public Mono<CourseApplicationDto> cancel(Long applicationId, Long studentId) {
         log.info("cancel applicationId: {} studentId: {}", applicationId, studentId);
 
-        CourseApplication application = findById(applicationId);
-        if (!application.getStudentId().equals(studentId)) {
-            throw new SsoApplicationException(HttpStatus.FORBIDDEN.value(), "Not your application");
-        }
+        return findById(applicationId)
+                .flatMap(application -> {
+                    if (!application.getStudentId().equals(studentId)) {
+                        return Mono.error(new SsoApplicationException(HttpStatus.FORBIDDEN.value(), "Not your application"));
+                    }
+                    if (!application.getStatus().equals(PENDING)) {
+                        return Mono.error(new SsoApplicationException(HttpStatus.BAD_REQUEST.value(), "Only pending applications can be cancelled"));
+                    }
 
-        if (!application.getStatus().equals(PENDING)) {
-            throw new SsoApplicationException(HttpStatus.BAD_REQUEST.value(), "Only pending applications can be cancelled");
-        }
+                    application.setStatus(CANCELLED);
+                    application.setCancelledAt(LocalDateTime.now());
 
-        application.setStatus(CANCELLED);
-        application.setCancelledAt(LocalDateTime.now());
-
-        application = repository.save(application);
-        return populateApplicationsInfo(List.of(application)).get(0);
+                    return repository.save(application);
+                })
+                .flatMap(savedApp -> populateApplicationsInfo(List.of(savedApp)).next());
     }
 
     /**
@@ -133,20 +140,22 @@ public class CourseApplicationService {
      * @param reviewerId the reviewer id
      * @return the application that is going to be reviewed
      */
-    public CourseApplicationDto startReview(Long applicationId, Long reviewerId) {
+    public Mono<CourseApplicationDto> startReview(Long applicationId, Long reviewerId) {
         log.info("Start reviewing applicationId: {} by reviewerId: {}", applicationId, reviewerId);
 
-        CourseApplication application = findById(applicationId);
-        if (!application.getStatus().equals(PENDING)) {
-            throw new SsoApplicationException(HttpStatus.BAD_REQUEST.value(), "Only pending applications can be reviewed");
-        }
+        return findById(applicationId)
+                .flatMap(application -> {
+                    if (!application.getStatus().equals(PENDING)) {
+                        return Mono.error(new SsoApplicationException(HttpStatus.BAD_REQUEST.value(), "Only pending applications can be reviewed"));
+                    }
 
-        application.setStatus(CourseApplicationStatus.IN_PROGRESS);
-        application.setReviewStartedAt(LocalDateTime.now());
-        application.setReviewerId(reviewerId);
+                    application.setStatus(CourseApplicationStatus.IN_PROGRESS);
+                    application.setReviewStartedAt(LocalDateTime.now());
+                    application.setReviewerId(reviewerId);
 
-        application = repository.save(application);
-        return populateApplicationsInfo(List.of(application)).get(0);
+                    return repository.save(application);
+                })
+                .flatMap(savedApp -> populateApplicationsInfo(List.of(savedApp)).next());
     }
 
     /**
@@ -157,29 +166,32 @@ public class CourseApplicationService {
      * @param comment decision comment
      * @return the approved/rejected course application
      */
-    public CourseApplicationDto decide(Long applicationId, Long reviewerId, boolean approve, String comment) {
+    public Mono<CourseApplicationDto> decide(Long applicationId, Long reviewerId, boolean approve, String comment) {
         log.info("Approve/reject applicationId: {} by reviewerId: {}, decision: {}", applicationId, reviewerId,
                 approve ? "approved" : "rejected");
 
-        CourseApplication application = findById(applicationId);
-        if (!application.getStatus().equals(IN_PROGRESS)) {
-            throw new SsoApplicationException(HttpStatus.BAD_REQUEST.value(), "Only in-progress applications can be decided");
-        }
-        application.setStatus(approve ? CourseApplicationStatus.APPROVED : CourseApplicationStatus.REJECTED);
-        application.setReviewedAt(LocalDateTime.now());
-        application.setReviewerId(reviewerId);
-        application.setDecisionComment(comment);
+        return findById(applicationId)
+                .flatMap(application -> {
+                    if (!application.getStatus().equals(IN_PROGRESS)) {
+                        return Mono.error(new SsoApplicationException(
+                                HttpStatus.BAD_REQUEST.value(), "Only in-progress applications can be decided"));
+                    }
 
-        application = repository.save(application);
-        CourseApplicationDto applicationDto = populateApplicationsInfo(List.of(application)).get(0);
+                    application.setStatus(approve ? CourseApplicationStatus.APPROVED : CourseApplicationStatus.REJECTED);
+                    application.setReviewedAt(LocalDateTime.now());
+                    application.setReviewerId(reviewerId);
+                    application.setDecisionComment(comment);
 
-        // TODO: If approved, emit event to Kafka for course enrollment
-        if (approve) {
-            // Example stub - we’ll implement the event later
-            // kafkaProducer.send(new CourseApplicationApprovedEvent(app.getCourseId(), app.getStudentId()));
-        }
-
-        return applicationDto;
+                    return repository.save(application);
+                })
+                .flatMap(saved -> populateApplicationsInfo(List.of(saved)).next())
+                .doOnNext(app -> {
+                    // TODO: If approved, emit event to Kafka for course enrollment
+                    if (approve) {
+                        // Example stub - we’ll implement the event later
+                        // kafkaProducer.send(new CourseApplicationApprovedEvent(app.getCourseId(), app.getStudentId()));
+                    }
+                });
     }
 
     /**
@@ -187,9 +199,9 @@ public class CourseApplicationService {
      * @param applications course application list
      * @return course application list with all the required inforamtion
      */
-    private List<CourseApplicationDto> populateApplicationsInfo(List<CourseApplication> applications) {
+    private Flux<CourseApplicationDto> populateApplicationsInfo(List<CourseApplication> applications) {
         if (applications == null || applications.isEmpty()) {
-            return List.of();
+            return Flux.empty();
         }
 
         List<CourseApplicationDto> applicationDtos = applications.stream().map(mapper::toDto).toList();
@@ -201,21 +213,27 @@ public class CourseApplicationService {
      * @param applications course application list
      * @return course applications with enriched data
      */
-    private List<CourseApplicationDto> enrich(List<CourseApplicationDto> applications) {
+    private Flux<CourseApplicationDto> enrich(List<CourseApplicationDto> applications) {
         if (applications == null || applications.isEmpty()) {
-            return List.of();
+            return Flux.empty();
         }
 
         // 1: Get data for enrich
-        Map<Long, AppUserDto> userMap = getUsers(applications);
-        Map<Long, CourseDto> courseMap = getCourses(applications);
+        Mono<Map<Long, AppUserDto>> userMapMono = getUsers(applications);
+        Mono<Map<Long, CourseDto>> courseMapMono = getCourses(applications);
 
         // 2: Enrich applications
-        for (CourseApplicationDto application : applications) {
-            enrichApplication(application, userMap, courseMap);
-        }
+        return Mono.zip(userMapMono, courseMapMono)
+                .flatMapMany(tuple -> {
+                    Map<Long, AppUserDto> userMap = tuple.getT1();
+                    Map<Long, CourseDto> courseMap = tuple.getT2();
 
-        return applications;
+                    return Flux.fromIterable(applications)
+                            .map(app -> {
+                                enrichApplication(app, userMap, courseMap);
+                                return app;
+                            });
+                });
     }
 
     /**
@@ -223,15 +241,14 @@ public class CourseApplicationService {
      * @param applications course applications
      * @return user list
      */
-    private Map<Long, AppUserDto> getUsers(List<CourseApplicationDto> applications) {
+    private Mono<Map<Long, AppUserDto>> getUsers(List<CourseApplicationDto> applications) {
         // Step 1: Extract IDs
         List<Long> userIds = getAllUserIds(applications);
         // Step 2: Fetch data
-        List<AppUserDto> users = userWebClient.getUsersByIds(userIds);
+        Flux<AppUserDto> users = userWebClient.getUsersByIds(userIds);
 
         // Step 3: Map by ID
-        return users.stream()
-                .collect(Collectors.toMap(AppUserDto::getId, Function.identity()));
+        return users.collectMap(AppUserDto::getId);
     }
 
     /**
@@ -239,15 +256,15 @@ public class CourseApplicationService {
      * @param applications course applications
      * @return user list
      */
-    private Map<Long, CourseDto> getCourses(List<CourseApplicationDto> applications) {
+    private Mono<Map<Long, CourseDto>> getCourses(List<CourseApplicationDto> applications) {
         // Step 1: Extract IDs
         List<Long> courseIds = getCourseIds(applications);
+
         // Step 2: Fetch data
-        List<CourseDto> courses = courseWebClient.findCoursesByIds(courseIds);
+        Flux<CourseDto> courses = courseWebClient.findCoursesByIds(courseIds);
 
         // Step 3: Map by ID
-        return courses.stream()
-                .collect(Collectors.toMap(CourseDto::getId, Function.identity()));
+        return courses.collectMap(CourseDto::getId);
     }
 
     /**
@@ -316,8 +333,9 @@ public class CourseApplicationService {
         return courseIds;
     }
 
-    private CourseApplication findById(Long applicationId) {
+    private Mono<CourseApplication> findById(Long applicationId) {
         return repository.findById(applicationId)
-                .orElseThrow(() -> new SsoApplicationException(HttpStatus.BAD_REQUEST.value(), "Application not found"));
+                .switchIfEmpty(Mono.error(
+                        new SsoApplicationException(HttpStatus.BAD_REQUEST.value(), "Application not found")));
     }
 }

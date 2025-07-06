@@ -71,13 +71,13 @@ public class CourseService {
 
     private CourseDetailsDto getCourseDetails(Course course) {
         // Fetch teacher
-        AppUserDto teacher = course.getTeacherId() != null ? userWebClient.getUserById(course.getTeacherId()) : null;
+        AppUserDto teacher = course.getTeacherId() != null ? userWebClient.getUserById(course.getTeacherId()).block() : null;
         List<Long> studentIds = course.getEnrollments().stream()
                 .map(e -> e.getId().getStudentId())
                 .toList();
 
         // Fetch students
-        List<AppUserDto> students = userWebClient.getUsersByIds(studentIds);
+        List<AppUserDto> students = userWebClient.getUsersByIds(studentIds).collectList().block();
 
         return courseMapper.toDetailsDto(course, teacher, students);
     }

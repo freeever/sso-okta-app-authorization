@@ -10,7 +10,6 @@ import com.dxu.sso.course.application.service.CourseApplicationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @RestController
@@ -39,12 +38,11 @@ public class CourseApplicationController {
      */
     @RequireRoles({"TEACHER", "ADMIN"})
     @GetMapping("/by-course/{courseId}/{status}")
-    public ResponseEntity<List<CourseApplicationDto>> findByCourseAndStatus(@PathVariable Long courseId,
-                                                                            @PathVariable CourseApplicationStatus status) {
+    public Flux<CourseApplicationDto> findByCourseAndStatus(@PathVariable Long courseId,
+                                                             @PathVariable CourseApplicationStatus status) {
         log.info("find applications by courseId: {} status: {}", courseId, status);
 
-        List<CourseApplicationDto> applications = service.findByCourseAndStatus(courseId, status);
-        return ResponseEntity.ok(applications);
+        return service.findByCourseAndStatus(courseId, status);
     }
 
     /**
@@ -54,13 +52,12 @@ public class CourseApplicationController {
      */
     @RequireRoles({"STUDENT"})
     @GetMapping("/my")
-    public ResponseEntity<List<CourseApplicationDto>> findMyApplications(@RequestParam(required = false) Long courseId) {
+    public Flux<CourseApplicationDto> findMyApplications(@RequestParam(required = false) Long courseId) {
         log.info("find my applications for course: {}", courseId == null ? "ALL" : courseId);
 
-        List<CourseApplicationDto> applications = courseId == null ?
+        return courseId == null ?
                 service.findByStudentId(getCurrentUserId())
                 : service.findByStudentAndCourse(getCurrentUserId(), courseId);
-        return ResponseEntity.ok(applications);
     }
 
     /**
@@ -70,11 +67,10 @@ public class CourseApplicationController {
      */
     @RequireRoles({"STUDENT"})
     @PostMapping
-    public ResponseEntity<CourseApplicationDto> apply(@RequestBody @Valid CourseApplicationCreateRequest request) {
+    public Mono<CourseApplicationDto> apply(@RequestBody @Valid CourseApplicationCreateRequest request) {
         log.info("apply courseId: {} studentId: {}", request.getCourseId(), getCurrentUserId());
 
-        CourseApplicationDto application = service.apply(request.getCourseId(), getCurrentUserId());
-        return ResponseEntity.ok(application);
+        return service.apply(request.getCourseId(), getCurrentUserId());
     }
 
     /**
@@ -84,11 +80,10 @@ public class CourseApplicationController {
      */
     @RequireRoles({"STUDENT"})
     @PutMapping("/{id}/cancel")
-    public ResponseEntity<CourseApplicationDto> cancel(@PathVariable Long id) {
+    public Mono<CourseApplicationDto> cancel(@PathVariable Long id) {
         log.info("cancel applicationId: {} by reviewerId: {}", id, getCurrentUserId());
 
-        CourseApplicationDto application = service.cancel(id, getCurrentUserId());
-        return ResponseEntity.ok(application);
+        return service.cancel(id, getCurrentUserId());
     }
 
     private Long getCurrentUserId() {
@@ -102,11 +97,10 @@ public class CourseApplicationController {
      */
     @RequireRoles({"ADMIN"})
     @PutMapping("/{id}/review")
-    public ResponseEntity<CourseApplicationDto> startReview(@PathVariable Long id) {
+    public Mono<CourseApplicationDto> startReview(@PathVariable Long id) {
         log.info("start review applicationId: {} by reviewerId: {}", id, getCurrentUserId());
 
-        CourseApplicationDto application = service.startReview(id, getCurrentUserId());
-        return ResponseEntity.ok(application);
+        return service.startReview(id, getCurrentUserId());
     }
 
     /**
@@ -116,11 +110,10 @@ public class CourseApplicationController {
      */
     @RequireRoles({"ADMIN"})
     @PutMapping("/{id}/decide")
-    public ResponseEntity<CourseApplicationDto> decide(@PathVariable Long id,
+    public Mono<CourseApplicationDto> decide(@PathVariable Long id,
                                                        @RequestBody @Valid CourseApplicationDecisionRequest request) {
         log.info("{} applicationId: {} by reviewerId: {}", request.isApprove() ? "approve" : "reject", id, getCurrentUserId());
 
-        CourseApplicationDto application = service.decide(id, getCurrentUserId(), request.isApprove(), request.getComment());
-        return ResponseEntity.ok(application);
+        return service.decide(id, getCurrentUserId(), request.isApprove(), request.getComment());
     }
 }
