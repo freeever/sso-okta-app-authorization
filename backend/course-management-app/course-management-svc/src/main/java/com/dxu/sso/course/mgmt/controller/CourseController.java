@@ -3,7 +3,7 @@ package com.dxu.sso.course.mgmt.controller;
 import com.dxu.sso.common.dto.course.CourseDetailsDto;
 import com.dxu.sso.common.security.RequireRoles;
 import com.dxu.sso.common.dto.course.CourseSaveRequest;
-import com.dxu.sso.course.mgmt.CourseService;
+import com.dxu.sso.course.mgmt.service.CourseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +36,7 @@ public class CourseController {
 
     @RequireRoles({"ADMIN"})
     @PutMapping("/{id}")
-    public ResponseEntity<CourseDetailsDto> update(@PathVariable Long id,
+    public ResponseEntity<CourseDetailsDto> update(@PathVariable("id") Long id,
                                                    @RequestBody @Valid CourseSaveRequest request) {
         log.info("[course-management-svc] - Update course");
 
@@ -46,7 +46,7 @@ public class CourseController {
 
     @RequireRoles({"ADMIN"})
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable("id") Long id) {
         log.info("[course-management-svc] - Delete course: {}", id);
 
         courseService.deleteById(id);

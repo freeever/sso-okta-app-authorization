@@ -37,10 +37,10 @@ public class CourseApplicationController {
      * @param status course application status
      * @return List of the applications for the given course and status
      */
-    @RequireRoles({"TEACHER", "ADMIN"})
+    @RequireRoles({"STUDENT", "TEACHER", "ADMIN"})
     @GetMapping("/by-course/{courseId}/{status}")
-    public ResponseEntity<List<CourseApplicationDto>> findByCourseAndStatus(@PathVariable Long courseId,
-                                                                            @PathVariable CourseApplicationStatus status) {
+    public ResponseEntity<List<CourseApplicationDto>> findByCourseAndStatus(@PathVariable("courseId") Long courseId,
+                                                                            @PathVariable("status") CourseApplicationStatus status) {
         log.info("find applications by courseId: {} status: {}", courseId, status);
 
         List<CourseApplicationDto> applications = service.findByCourseAndStatus(courseId, status);
@@ -84,7 +84,7 @@ public class CourseApplicationController {
      */
     @RequireRoles({"STUDENT"})
     @PutMapping("/{id}/cancel")
-    public ResponseEntity<CourseApplicationDto> cancel(@PathVariable Long id) {
+    public ResponseEntity<CourseApplicationDto> cancel(@PathVariable("id") Long id) {
         log.info("cancel applicationId: {} by reviewerId: {}", id, getCurrentUserId());
 
         CourseApplicationDto application = service.cancel(id, getCurrentUserId());
@@ -102,7 +102,7 @@ public class CourseApplicationController {
      */
     @RequireRoles({"ADMIN"})
     @PutMapping("/{id}/review")
-    public ResponseEntity<CourseApplicationDto> startReview(@PathVariable Long id) {
+    public ResponseEntity<CourseApplicationDto> startReview(@PathVariable("id") Long id) {
         log.info("start review applicationId: {} by reviewerId: {}", id, getCurrentUserId());
 
         CourseApplicationDto application = service.startReview(id, getCurrentUserId());
@@ -116,7 +116,7 @@ public class CourseApplicationController {
      */
     @RequireRoles({"ADMIN"})
     @PutMapping("/{id}/decide")
-    public ResponseEntity<CourseApplicationDto> decide(@PathVariable Long id,
+    public ResponseEntity<CourseApplicationDto> decide(@PathVariable("id") Long id,
                                                        @RequestBody @Valid CourseApplicationDecisionRequest request) {
         log.info("{} applicationId: {} by reviewerId: {}", request.isApprove() ? "approve" : "reject", id, getCurrentUserId());
 

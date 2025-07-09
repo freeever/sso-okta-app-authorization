@@ -16,7 +16,7 @@ import java.net.URI;
 public class OAuth2LoginController {
 
     @GetMapping("/{client}")
-    public Mono<Void> loginWithRedirect(@PathVariable String client,
+    public Mono<Void> loginWithRedirect(@PathVariable("client") String client,
                                         @RequestParam(required = false) String redirectTo,
                                         ServerWebExchange exchange) {
         return exchange.getSession().flatMap(session -> {

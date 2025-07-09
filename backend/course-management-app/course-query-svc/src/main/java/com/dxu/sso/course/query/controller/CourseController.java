@@ -38,7 +38,7 @@ public class CourseController {
 
     @RequireUserProfile
     @GetMapping("/{id}")
-    public ResponseEntity<CourseDetailsDto> findCourseDetails(@PathVariable Long id) {
+    public ResponseEntity<CourseDetailsDto> findCourseDetails(@PathVariable("id") Long id) {
         log.info("[course-query-svc] - Fetching course details");
 
         CourseDetailsDto courseDetails = courseService.findCourseDetails(id);

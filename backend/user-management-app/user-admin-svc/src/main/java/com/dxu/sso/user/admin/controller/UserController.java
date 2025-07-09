@@ -29,7 +29,7 @@ public class UserController {
 
     @RequireRoles({"ADMIN", "TEACHER", "STUDENT"})
     @GetMapping("/{id}")
-    public ResponseEntity<AppUserDto> findById(@PathVariable Long id) throws SsoApplicationException {
+    public ResponseEntity<AppUserDto> findById(@PathVariable("id") Long id) throws SsoApplicationException {
         log.info("get user by id: {}", id);
 
         AppUserDto user = userService.findById(id);
@@ -63,7 +63,7 @@ public class UserController {
 
     @RequireRoles({"ADMIN"})
     @PutMapping("/{id}")
-    public ResponseEntity<AppUserDto> update(@PathVariable Long id, @Valid @RequestBody AppUserDto update)
+    public ResponseEntity<AppUserDto> update(@PathVariable("id") Long id, @Valid @RequestBody AppUserDto update)
             throws SsoApplicationException {
         log.info("update user by id: {}", id);
 
@@ -73,7 +73,7 @@ public class UserController {
 
     @RequireRoles({"ADMIN"})
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable("id") Long id) {
         log.info("delete users by id");
 
         userService.deleteById(id);
