@@ -4,6 +4,7 @@ import com.dxu.sso.common.dto.course.CourseApplicationDto;
 import com.dxu.sso.common.dto.course.CourseDto;
 import com.dxu.sso.common.dto.mapper.CourseApplicationMapper;
 import com.dxu.sso.common.dto.user.AppUserDto;
+import com.dxu.sso.common.event.CourseApplicationApprovedEvent;
 import com.dxu.sso.common.exception.SsoApplicationException;
 import com.dxu.sso.common.integration.CourseWebClient;
 import com.dxu.sso.common.integration.UserWebClient;
@@ -36,6 +37,7 @@ public class CourseApplicationService {
     private final CourseWebClient courseWebClient;
     private final CourseApplicationRepository repository;
     private final CourseApplicationMapper mapper;
+    private final KafkaProducerService kafkaProducerService;
 
     /**
      * Find applications of a course by status (used by ADMIN or TEACHER)
@@ -171,15 +173,29 @@ public class CourseApplicationService {
         application.setDecisionComment(comment);
 
         application = repository.save(application);
-        CourseApplicationDto applicationDto = populateApplicationsInfo(List.of(application)).get(0);
+        CourseApplicationDto savedApp = populateApplicationsInfo(List.of(application)).get(0);
 
-        // TODO: If approved, emit event to Kafka for course enrollment
+        // If approved, emit event to Kafka to create course enrollment
         if (approve) {
-            // Example stub - we’ll implement the event later
-            // kafkaProducer.send(new CourseApplicationApprovedEvent(app.getCourseId(), app.getStudentId()));
+            sendApprovedEvent(savedApp);
         }
 
-        return applicationDto;
+        return savedApp;
+    }
+
+    /**
+     * Send CourseApplicationApprovedEvent to Kafka, which will be consumed by course-management-svc and
+     * create course-enrollment record
+     * @param savedApp the approved course application
+     */
+    private void sendApprovedEvent(CourseApplicationDto savedApp) {
+        CourseApplicationApprovedEvent event = CourseApplicationApprovedEvent.builder()
+                .courseId(savedApp.getCourseId())
+                .studentId(savedApp.getStudentId())
+                .approvedAt(LocalDateTime.now())
+                .build();
+
+        kafkaProducerService.sendApplicationApprovedEvent(event);
     }
 
     /**

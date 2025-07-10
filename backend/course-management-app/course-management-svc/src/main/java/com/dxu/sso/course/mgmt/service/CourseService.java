@@ -1,4 +1,4 @@
-package com.dxu.sso.course.mgmt;
+package com.dxu.sso.course.mgmt.service;
 
 import com.dxu.sso.common.dto.course.CourseDetailsDto;
 import com.dxu.sso.common.dto.course.CourseSaveRequest;

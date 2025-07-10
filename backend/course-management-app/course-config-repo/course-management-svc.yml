@@ -21,6 +21,14 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  kafka:
+    bootstrap-servers: 172.27.223.47:9092
+    consumer:
+      group-id: course-management-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
 
 eureka:
   client:
@@ -36,3 +44,11 @@ url:
   user:
     profile: http://localhost:9002/api/profile/me
     admin: http://localhost:9003/api/admin/users
+
+custom:
+  kafka:
+    retry:
+      initial-delay: 1000       # in milliseconds
+      multiplier: 2.0
+      max-delay: 10000          # in milliseconds
+      max-attempts: 3
