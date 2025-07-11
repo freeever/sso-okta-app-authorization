@@ -10,20 +10,20 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-class CourseAppApprovedHandlerTest {
+class KafkaConsumerServiceTest {
 
-    private CourseAppApprovedHandler courseAppApprovedHandler;
+    private KafkaConsumerService kafkaConsumerService;
     private CourseEnrollmentService courseEnrollmentServiceMock;
 
     @BeforeEach
     void setUp() {
         courseEnrollmentServiceMock = mock(CourseEnrollmentService.class);
-        courseAppApprovedHandler = new CourseAppApprovedHandler(courseEnrollmentServiceMock);
+        kafkaConsumerService = new KafkaConsumerService(courseEnrollmentServiceMock);
     }
 
     @Test
     void testConsumeApplicationApproved() {
-        courseAppApprovedHandler.consumeApplicationApproved(new CourseApplicationApprovedEvent(2L, 3L, LocalDateTime.now()));
+        kafkaConsumerService.consumeApplicationApproved(new CourseApplicationApprovedEvent(2L, 3L, LocalDateTime.now()));
         verify(courseEnrollmentServiceMock, times(1));
     }
 }

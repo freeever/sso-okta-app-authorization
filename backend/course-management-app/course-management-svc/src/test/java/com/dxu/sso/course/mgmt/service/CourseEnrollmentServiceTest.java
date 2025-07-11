@@ -1,5 +1,6 @@
 package com.dxu.sso.course.mgmt.service;
 
+import com.dxu.sso.course.mgmt.repository.CourseEnrollmentRepository;
 import com.dxu.sso.course.mgmt.repository.CourseRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,11 +12,12 @@ class CourseEnrollmentServiceTest {
 
     private CourseEnrollmentService courseEnrollmentService;
     private CourseRepository courseRepositoryMock;
+    private CourseEnrollmentRepository courseEnrollmentRepositoryMock;
 
     @BeforeEach
     void setUp() {
         courseRepositoryMock = mock(CourseRepository.class);
-        courseEnrollmentService = new CourseEnrollmentService(courseRepositoryMock);
+        courseEnrollmentService = new CourseEnrollmentService(courseRepositoryMock, courseEnrollmentRepositoryMock);
     }
 
     @Test
