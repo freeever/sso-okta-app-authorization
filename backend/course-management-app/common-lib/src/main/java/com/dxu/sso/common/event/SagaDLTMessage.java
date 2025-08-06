@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CourseApplicationApprovedDLTMessage {
-    private CourseApplicationApprovedEvent originalEvent;
+public class SagaDLTMessage {
+    private SagaEvent originalEvent;
     private String errorMessage;
     private String stackTrace;
 }

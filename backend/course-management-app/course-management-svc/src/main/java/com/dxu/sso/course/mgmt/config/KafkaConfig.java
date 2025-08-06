@@ -1,7 +1,7 @@
 package com.dxu.sso.course.mgmt.config;
 
-import com.dxu.sso.common.event.CourseApplicationApprovedDLTMessage;
-import com.dxu.sso.common.event.CourseApplicationApprovedEvent;
+import com.dxu.sso.common.event.SagaDLTMessage;
+import com.dxu.sso.common.event.SagaEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.dxu.sso.common.constant.KafkaEventConstants.TOPIC_COURSE_APPLICATION_DLT;
+
 @Slf4j
 @RequiredArgsConstructor
 @Configuration
@@ -32,7 +34,7 @@ public class KafkaConfig {
 
     @Bean
     public DefaultErrorHandler errorHandler(
-            @Qualifier("dltKafkaTemplate") KafkaTemplate<String, CourseApplicationApprovedDLTMessage> dltKafkaTemplate) {
+            @Qualifier("dltKafkaTemplate") KafkaTemplate<String, SagaDLTMessage> dltKafkaTemplate) {
         // Backoff with initial delay 1s, multiplier 2x, max delay 10s, max attempts 3
         ExponentialBackOffWithMaxRetries backoff = new ExponentialBackOffWithMaxRetries(retryProperties.getMaxAttempts());
         backoff.setInitialInterval(retryProperties.getInitialDelay());
@@ -43,13 +45,13 @@ public class KafkaConfig {
             log.error("📦 Sending to DLT: {}", exception.getMessage());
 
             Object value = record.value();
-            if (value instanceof CourseApplicationApprovedEvent originalEvent) {
-                CourseApplicationApprovedDLTMessage dltMessage = CourseApplicationApprovedDLTMessage.builder()
+            if (value instanceof SagaEvent originalEvent) {
+                SagaDLTMessage dltMessage = SagaDLTMessage.builder()
                         .originalEvent(originalEvent)
                         .errorMessage(exception.getMessage())
                         .stackTrace(Arrays.toString(exception.getStackTrace()))
                         .build();
-                dltKafkaTemplate.send("course-application-approved-dlt", (String)record.key(), dltMessage);
+                dltKafkaTemplate.send(TOPIC_COURSE_APPLICATION_DLT, (String)record.key(), dltMessage);
             } else {
                 log.warn("⚠️ Unrecognized message. Skipping DLT fallback.");
             }
@@ -75,7 +77,7 @@ public class KafkaConfig {
 
     // ✅ Producer Factory for DLT messages
     @Bean
-    public ProducerFactory<String, CourseApplicationApprovedDLTMessage> dltProducerFactory(
+    public ProducerFactory<String, SagaDLTMessage> dltProducerFactory(
             @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers) {
 
         Map<String, Object> configProps = new HashMap<>();
@@ -110,8 +112,8 @@ public class KafkaConfig {
      * Dedicated KafkaTemplate for sending DLT messages
      */
     @Bean
-    public KafkaTemplate<String, CourseApplicationApprovedDLTMessage> dltKafkaTemplate(
-            ProducerFactory<String, CourseApplicationApprovedDLTMessage> dltProducerFactory) {
+    public KafkaTemplate<String, SagaDLTMessage> dltKafkaTemplate(
+            ProducerFactory<String, SagaDLTMessage> dltProducerFactory) {
         return new KafkaTemplate<>(dltProducerFactory);
     }
 

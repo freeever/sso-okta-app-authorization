@@ -1,32 +1,38 @@
 package com.dxu.sso.course.application.service;
 
+import com.dxu.sso.common.constant.CourseApplicationStatus;
 import com.dxu.sso.common.dto.course.CourseApplicationDto;
 import com.dxu.sso.common.dto.course.CourseDto;
 import com.dxu.sso.common.dto.mapper.CourseApplicationMapper;
 import com.dxu.sso.common.dto.user.AppUserDto;
 import com.dxu.sso.common.event.CourseApplicationApprovedEvent;
+import com.dxu.sso.common.event.SagaEventUtil;
 import com.dxu.sso.common.exception.SsoApplicationException;
 import com.dxu.sso.common.integration.CourseWebClient;
 import com.dxu.sso.common.integration.UserWebClient;
-import com.dxu.sso.common.model.CourseApplicationStatus;
 import com.dxu.sso.common.model.courseapp.CourseApplication;
 import com.dxu.sso.course.application.repository.CourseApplicationRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.dxu.sso.common.model.CourseApplicationStatus.APPROVED;
-import static com.dxu.sso.common.model.CourseApplicationStatus.CANCELLED;
-import static com.dxu.sso.common.model.CourseApplicationStatus.IN_PROGRESS;
-import static com.dxu.sso.common.model.CourseApplicationStatus.PENDING;
+import static com.dxu.sso.common.constant.CourseApplicationStatus.APPROVED;
+import static com.dxu.sso.common.constant.CourseApplicationStatus.CANCELLED;
+import static com.dxu.sso.common.constant.CourseApplicationStatus.IN_PROGRESS;
+import static com.dxu.sso.common.constant.CourseApplicationStatus.PENDING;
+import static com.dxu.sso.common.constant.KafkaEventConstants.TOPIC_COURSE_APPLICATION_APPROVED;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -37,7 +43,7 @@ public class CourseApplicationService {
     private final CourseWebClient courseWebClient;
     private final CourseApplicationRepository repository;
     private final CourseApplicationMapper mapper;
-    private final KafkaProducerService kafkaProducerService;
+    private final KafkaTemplate<String, CourseApplicationApprovedEvent> kafkaTemplate;
 
     /**
      * Find applications of a course by status (used by ADMIN or TEACHER)
@@ -159,6 +165,7 @@ public class CourseApplicationService {
      * @param comment decision comment
      * @return the approved/rejected course application
      */
+    @Transactional
     public CourseApplicationDto decide(Long applicationId, Long reviewerId, boolean approve, String comment) {
         log.info("Approve/reject applicationId: {} by reviewerId: {}, decision: {}", applicationId, reviewerId,
                 approve ? "approved" : "rejected");
@@ -167,13 +174,7 @@ public class CourseApplicationService {
         if (!application.getStatus().equals(IN_PROGRESS)) {
             throw new SsoApplicationException(HttpStatus.BAD_REQUEST.value(), "Only in-progress applications can be decided");
         }
-        application.setStatus(approve ? CourseApplicationStatus.APPROVED : CourseApplicationStatus.REJECTED);
-        application.setReviewedAt(LocalDateTime.now());
-        application.setReviewerId(reviewerId);
-        application.setDecisionComment(comment);
-
-        application = repository.save(application);
-        CourseApplicationDto savedApp = populateApplicationsInfo(List.of(application)).get(0);
+        CourseApplicationDto savedApp = updateApplication(reviewerId, approve, comment, application);
 
         // If approved, emit event to Kafka to create course enrollment
         if (approve) {
@@ -184,18 +185,38 @@ public class CourseApplicationService {
     }
 
     /**
+     * Update course-application
+     * @param reviewerId reviewer's user id
+     * @param approve true is approve
+     *                false is reject
+     * @param comment comments for decision
+     * @param application the course-application
+     * @return the updated course-application
+     */
+    private CourseApplicationDto updateApplication(Long reviewerId, boolean approve, String comment, CourseApplication application) {
+        application.setStatus(approve ? CourseApplicationStatus.APPROVED : CourseApplicationStatus.REJECTED);
+        application.setReviewedAt(LocalDateTime.now());
+        application.setReviewerId(reviewerId);
+        application.setDecisionComment(comment);
+
+        application = repository.save(application);
+        return populateApplicationsInfo(List.of(application)).get(0);
+    }
+
+    /**
      * Send CourseApplicationApprovedEvent to Kafka, which will be consumed by course-management-svc and
      * create course-enrollment record
-     * @param savedApp the approved course application
+     * @param app the approved course application
      */
-    private void sendApprovedEvent(CourseApplicationDto savedApp) {
-        CourseApplicationApprovedEvent event = CourseApplicationApprovedEvent.builder()
-                .courseId(savedApp.getCourseId())
-                .studentId(savedApp.getStudentId())
-                .approvedAt(LocalDateTime.now())
-                .build();
+    private void sendApprovedEvent(CourseApplicationDto app) {
+        UUID sagaId = UUID.randomUUID();
+        CourseApplicationApprovedEvent evt = new CourseApplicationApprovedEvent(sagaId, Instant.now(),
+                app.getCourseId(), app.getStudentId(), app.getId());
 
-        kafkaProducerService.sendApplicationApprovedEvent(event);
+        log.info("send application approved event. course: {} student: {}", evt.courseId(), evt.studentId());
+        kafkaTemplate.send(TOPIC_COURSE_APPLICATION_APPROVED,
+                SagaEventUtil.buildCourseApplicationEvtKey(app.getCourseId(), app.getStudentId()), evt);
+        log.info("▶️  published {}", evt);
     }
 
     /**
@@ -335,5 +356,12 @@ public class CourseApplicationService {
     private CourseApplication findById(Long applicationId) {
         return repository.findById(applicationId)
                 .orElseThrow(() -> new SsoApplicationException(HttpStatus.BAD_REQUEST.value(), "Application not found"));
+    }
+
+    public void updateStatus(Long applicationId, CourseApplicationStatus status) {
+        CourseApplication ca = repository.findById(applicationId)
+                .orElseThrow(() -> new SsoApplicationException("Course application not found: [" + applicationId + "]"));
+        ca.setStatus(status);
+        repository.save(ca);
     }
 }

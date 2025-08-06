@@ -1,6 +1,6 @@
 package com.dxu.sso.common.model.user;
 
-import com.dxu.sso.common.model.Role;
+import com.dxu.sso.common.constant.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

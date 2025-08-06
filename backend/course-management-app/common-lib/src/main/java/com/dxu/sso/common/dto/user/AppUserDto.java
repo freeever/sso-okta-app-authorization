@@ -1,6 +1,6 @@
 package com.dxu.sso.common.dto.user;
 
-import com.dxu.sso.common.model.Role;
+import com.dxu.sso.common.constant.Role;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

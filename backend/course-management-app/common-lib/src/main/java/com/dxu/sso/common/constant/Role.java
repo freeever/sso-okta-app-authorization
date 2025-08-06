@@ -1,4 +1,4 @@
-package com.dxu.sso.common.model;
+package com.dxu.sso.common.constant;
 
 public enum Role {
     ADMIN, STUDENT, TEACHER, NONE

@@ -1,6 +1,6 @@
 package com.dxu.sso.course.application.repository;
 
-import com.dxu.sso.common.model.CourseApplicationStatus;
+import com.dxu.sso.common.constant.CourseApplicationStatus;
 import com.dxu.sso.common.model.courseapp.CourseApplication;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

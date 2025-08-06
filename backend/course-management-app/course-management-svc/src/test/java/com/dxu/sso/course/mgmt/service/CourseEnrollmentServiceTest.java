@@ -21,7 +21,7 @@ class CourseEnrollmentServiceTest {
     }
 
     @Test
-    void testEnrollStudent() {
+    void testEnroll() {
 //        courseEnrollmentService.enrollStudent(2L, 3L);
     }
 }

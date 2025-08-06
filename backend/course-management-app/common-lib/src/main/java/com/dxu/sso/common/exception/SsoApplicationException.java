@@ -7,7 +7,11 @@ import lombok.Setter;
 @Setter
 public class SsoApplicationException extends RuntimeException {
 
-    private final int statusCode;
+    private int statusCode;
+
+    public SsoApplicationException(String message) {
+        super(message);
+    }
 
     public SsoApplicationException(int statusCode, String message) {
         super(message);

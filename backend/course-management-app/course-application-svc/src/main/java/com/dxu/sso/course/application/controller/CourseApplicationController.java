@@ -1,7 +1,7 @@
 package com.dxu.sso.course.application.controller;
 
 import com.dxu.sso.common.dto.course.CourseApplicationDto;
-import com.dxu.sso.common.model.CourseApplicationStatus;
+import com.dxu.sso.common.constant.CourseApplicationStatus;
 import com.dxu.sso.common.security.RequireRoles;
 import com.dxu.sso.common.security.UserContext;
 import com.dxu.sso.course.application.dto.CourseApplicationCreateRequest;
