@@ -11,20 +11,20 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-class CourseEventHandlerTest {
+class CourseEnrollmentEventHandlerTest {
 
-    private CourseEventHandler courseEventHandler;
+    private CourseEnrollmentEventHandler courseEnrollmentEventHandler;
     private CourseEnrollmentService courseEnrollmentServiceMock;
 
     @BeforeEach
     void setUp() {
         courseEnrollmentServiceMock = mock(CourseEnrollmentService.class);
-        courseEventHandler = new CourseEventHandler(courseEnrollmentServiceMock);
+        courseEnrollmentEventHandler = new CourseEnrollmentEventHandler(courseEnrollmentServiceMock);
     }
 
     @Test
     void testOnApplicationApproved() {
-        courseEventHandler.onApplicationApproved(new CourseApplicationApprovedEvent(
+        courseEnrollmentEventHandler.onApplicationApproved(new CourseApplicationApprovedEvent(
                 UUID.randomUUID(), Instant.now(), 2L, 3L, 1L));
         verify(courseEnrollmentServiceMock, times(1));
     }

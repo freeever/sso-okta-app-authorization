@@ -1,6 +1,5 @@
 package com.dxu.sso.course.application.service;
 
-import com.dxu.sso.common.constant.KafkaEventConstants;
 import com.dxu.sso.common.event.CourseEnrollmentCreatedEvent;
 import com.dxu.sso.common.event.CourseEnrollmentExistedEvent;
 import com.dxu.sso.common.event.CourseEnrollmentFailedEvent;
@@ -19,7 +18,7 @@ import static com.dxu.sso.common.constant.KafkaEventConstants.TOPIC_COURSE_ENROL
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CourseEventHandler {
+public class CourseApplicationEventHandler {
 
     private final CourseApplicationService service;
 

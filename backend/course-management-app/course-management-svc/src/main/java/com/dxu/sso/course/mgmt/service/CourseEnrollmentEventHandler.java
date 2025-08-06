@@ -16,7 +16,7 @@ import static com.dxu.sso.common.constant.KafkaEventConstants.TOPIC_COURSE_APPLI
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CourseEventHandler {
+public class CourseEnrollmentEventHandler {
 
     private final CourseEnrollmentService enrollmentService;
 
