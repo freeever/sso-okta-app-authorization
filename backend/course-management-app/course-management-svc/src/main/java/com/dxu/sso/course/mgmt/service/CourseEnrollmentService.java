@@ -1,11 +1,11 @@
 package com.dxu.sso.course.mgmt.service;
 
-import com.dxu.sso.common.event.CourseApplicationApprovedEvent;
-import com.dxu.sso.common.event.CourseEnrollmentCreatedEvent;
-import com.dxu.sso.common.event.CourseEnrollmentExistedEvent;
-import com.dxu.sso.common.event.CourseEnrollmentFailedEvent;
-import com.dxu.sso.common.event.SagaEvent;
-import com.dxu.sso.common.event.SagaEventUtil;
+import com.dxu.sso.common.event.course.CourseApplicationApprovedEvent;
+import com.dxu.sso.common.event.course.CourseEnrollmentCreatedEvent;
+import com.dxu.sso.common.event.course.CourseEnrollmentExistedEvent;
+import com.dxu.sso.common.event.course.CourseEnrollmentFailedEvent;
+import com.dxu.sso.common.event.common.SagaEvent;
+import com.dxu.sso.common.event.common.SagaEventUtil;
 import com.dxu.sso.common.model.course.Course;
 import com.dxu.sso.common.model.course.CourseEnrollment;
 import com.dxu.sso.common.model.course.CourseEnrollmentId;

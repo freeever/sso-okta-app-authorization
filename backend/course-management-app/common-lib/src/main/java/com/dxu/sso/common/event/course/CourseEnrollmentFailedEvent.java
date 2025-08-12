@@ -1,13 +1,14 @@
-package com.dxu.sso.common.event;
+package com.dxu.sso.common.event.course;
 
 import java.time.Instant;
 import java.util.UUID;
 
 // ------------- Management side → Application side -------------
-public record CourseEnrollmentExistedEvent(
+public record CourseEnrollmentFailedEvent(
         UUID sagaId,
         Instant timestamp,
         Long courseId,
         Long studentId,
-        Long applicationId
+        Long applicationId,
+        String reason        // e.g. duplicate PK, DB error…
 ) implements CourseSagaEvent { }

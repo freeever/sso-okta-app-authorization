@@ -1,4 +1,6 @@
-package com.dxu.sso.common.event;
+package com.dxu.sso.common.event.course;
+
+import com.dxu.sso.common.event.common.SagaEvent;
 
 import java.time.Instant;
 import java.util.UUID;

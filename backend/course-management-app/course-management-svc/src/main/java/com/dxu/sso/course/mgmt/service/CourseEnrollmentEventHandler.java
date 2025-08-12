@@ -1,7 +1,7 @@
 package com.dxu.sso.course.mgmt.service;
 
-import com.dxu.sso.common.event.SagaDLTMessage;
-import com.dxu.sso.common.event.CourseApplicationApprovedEvent;
+import com.dxu.sso.common.event.common.SagaDLTMessage;
+import com.dxu.sso.common.event.course.CourseApplicationApprovedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;

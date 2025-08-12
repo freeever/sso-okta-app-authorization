@@ -1,7 +1,7 @@
 package com.dxu.sso.course.mgmt.config;
 
-import com.dxu.sso.common.event.SagaDLTMessage;
-import com.dxu.sso.common.event.SagaEvent;
+import com.dxu.sso.common.event.common.SagaDLTMessage;
+import com.dxu.sso.common.event.common.SagaEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerConfig;

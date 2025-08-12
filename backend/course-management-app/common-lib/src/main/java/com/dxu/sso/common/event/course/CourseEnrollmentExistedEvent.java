@@ -1,10 +1,10 @@
-package com.dxu.sso.common.event;
+package com.dxu.sso.common.event.course;
 
 import java.time.Instant;
 import java.util.UUID;
 
 // ------------- Management side → Application side -------------
-public record CourseEnrollmentCreatedEvent(
+public record CourseEnrollmentExistedEvent(
         UUID sagaId,
         Instant timestamp,
         Long courseId,

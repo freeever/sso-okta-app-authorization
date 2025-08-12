@@ -1,6 +1,6 @@
 package com.dxu.sso.course.application.config;
 
-import com.dxu.sso.common.event.CourseApplicationApprovedEvent;
+import com.dxu.sso.common.event.course.CourseApplicationApprovedEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.KafkaTemplate;

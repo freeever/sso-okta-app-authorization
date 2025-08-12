@@ -1,8 +1,8 @@
 package com.dxu.sso.course.application.service;
 
-import com.dxu.sso.common.event.CourseEnrollmentCreatedEvent;
-import com.dxu.sso.common.event.CourseEnrollmentExistedEvent;
-import com.dxu.sso.common.event.CourseEnrollmentFailedEvent;
+import com.dxu.sso.common.event.course.CourseEnrollmentCreatedEvent;
+import com.dxu.sso.common.event.course.CourseEnrollmentExistedEvent;
+import com.dxu.sso.common.event.course.CourseEnrollmentFailedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;

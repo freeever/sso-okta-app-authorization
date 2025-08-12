@@ -1,6 +1,6 @@
 package com.dxu.sso.course.mgmt.service;
 
-import com.dxu.sso.common.event.CourseApplicationApprovedEvent;
+import com.dxu.sso.common.event.course.CourseApplicationApprovedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
