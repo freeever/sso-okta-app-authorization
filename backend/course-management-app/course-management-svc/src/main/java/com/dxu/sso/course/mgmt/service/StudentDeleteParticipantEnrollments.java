@@ -1,8 +1,6 @@
 package com.dxu.sso.course.mgmt.service;
 
-import com.dxu.sso.common.constant.KafkaEventConstants;
 import com.dxu.sso.common.event.student.StudentDeleteCommand;
-import com.dxu.sso.common.event.student.StudentDeleteCommandType;
 import com.dxu.sso.common.event.student.StudentDeleteReply;
 import com.dxu.sso.common.event.student.StudentDeleteReplyType;
 import com.dxu.sso.common.exception.SsoApplicationException;
@@ -18,11 +16,9 @@ import org.springframework.stereotype.Service;
 import java.time.Clock;
 import java.time.Instant;
 
-import static com.dxu.sso.common.constant.KafkaEventConstants.GROUP_COURSE_APPLICATION;
 import static com.dxu.sso.common.constant.KafkaEventConstants.GROUP_COURSE_ENROL_STUDENT_DELETE;
 import static com.dxu.sso.common.constant.KafkaEventConstants.TOPIC_STUDENT_DELETE_CMDS;
 import static com.dxu.sso.common.constant.KafkaEventConstants.TOPIC_STUDENT_DELETE_REPLIES;
-import static com.dxu.sso.common.event.student.StudentDeleteCommandType.DELETE_ENROLLMENTS;
 import static com.dxu.sso.common.event.student.StudentDeleteReplyType.ENROLLMENTS_DELETED;
 import static com.dxu.sso.common.event.student.StudentDeleteReplyType.ENROLLMENTS_DELETE_FAILED;
 import static com.dxu.sso.common.event.student.StudentDeleteReplyType.ENROLLMENTS_RESTORED;
