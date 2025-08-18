@@ -1,10 +1,12 @@
 package com.dxu.sso.user.admin.service;
 
+import com.dxu.sso.common.constant.Role;
 import com.dxu.sso.common.dto.mapper.AppUserMapper;
 import com.dxu.sso.common.dto.user.AppUserDto;
 import com.dxu.sso.common.exception.SsoApplicationException;
 import com.dxu.sso.common.model.user.AppUser;
 import com.dxu.sso.user.admin.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -61,8 +63,25 @@ public class UserService {
         return userMapper.toDto(updated);
     }
 
+    @Transactional
     public void deleteById(Long id) {
-        userRepository.deleteById(id);
+        AppUser appUser = userRepository.findById(id)
+                .orElseThrow(() -> new SsoApplicationException(HttpStatus.BAD_REQUEST.value(), "User not found"));
+        if (appUser.getRole().equals(Role.STUDENT.name())) {
+            throw new SsoApplicationException(HttpStatus.BAD_REQUEST.value(), "Use API for student deletion instead");
+        }
+
+        appUser.setDeleted(true);
+        userRepository.save(appUser);
+    }
+
+    @Transactional
+    public void restore(Long id) {
+        AppUser appUser = userRepository.findById(id)
+                .orElseThrow(() -> new SsoApplicationException(HttpStatus.BAD_REQUEST.value(), "User not found"));
+
+        appUser.setDeleted(false);
+        userRepository.save(appUser);
     }
 
 }

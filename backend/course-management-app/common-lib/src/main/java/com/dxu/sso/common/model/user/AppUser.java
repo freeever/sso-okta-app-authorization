@@ -50,4 +50,7 @@ public class AppUser {
     private String gender;
 
     private LocalDate dateOfBirth;
+
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted;  // primitive avoids nulls
 }

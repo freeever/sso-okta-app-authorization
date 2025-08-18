@@ -56,11 +56,11 @@ class CourseMapperTest {
         course.setDescription("Grammar and Composition");
         course.setTeacherId(22L);
 
-        AppUserDto teacher = new AppUserDto(22L, "okta1", "teacher@example.com", "Jane", "Doe", "TEACHER", "F", LocalDate.of(1985, 5, 10));
+        AppUserDto teacher = new AppUserDto(22L, "okta1", "teacher@example.com", "Jane", "Doe", "TEACHER", "F", LocalDate.of(1985, 5, 10), false);
 
         List<AppUserDto> students = List.of(
-                new AppUserDto(31L, "okta2", "student1@example.com", "Tom", "Lee", "STUDENT", "M", LocalDate.of(2000, 1, 1)),
-                new AppUserDto(32L, "okta3", "student2@example.com", "Anna", "Kim", "STUDENT", "F", LocalDate.of(2001, 2, 2))
+                new AppUserDto(31L, "okta2", "student1@example.com", "Tom", "Lee", "STUDENT", "M", LocalDate.of(2000, 1, 1), false),
+                new AppUserDto(32L, "okta3", "student2@example.com", "Anna", "Kim", "STUDENT", "F", LocalDate.of(2001, 2, 2), false)
                                            );
 
         CourseDetailsDto dto = mapper.toDetailsDto(course, teacher, students);

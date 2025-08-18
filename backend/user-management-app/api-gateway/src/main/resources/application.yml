@@ -24,7 +24,11 @@ spring:
         - id: user-admin
           uri: lb://user-admin-svc
           predicates:
-            - Path=/api/admin/users/**
+            - name: Path
+              args:
+                patterns:
+                  - /api/admin/users/**
+                  - /api/admin/students/**
           filters:
             - TokenRelay
 

@@ -72,10 +72,18 @@ public class UserController {
     }
 
     @RequireRoles({"ADMIN"})
-    @DeleteMapping("/{id}")
+    @PutMapping("/delete/{id}")
     public void delete(@PathVariable("id") Long id) {
         log.info("delete users by id");
 
         userService.deleteById(id);
+    }
+
+    @RequireRoles({"ADMIN"})
+    @PutMapping("/restore/{id}")
+    public void restore(@PathVariable("id") Long id) {
+        log.info("restore users by id");
+
+        userService.restore(id);
     }
 }

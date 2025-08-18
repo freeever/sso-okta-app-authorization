@@ -57,4 +57,7 @@ public class CourseApplication {
 
     @Column(name = "decision_comment")
     private String decisionComment;
+
+    @Column(name = "student_deleted", nullable = false)
+    private boolean studentDeleted; // primitive avoids nulls
 }

@@ -1,4 +1,4 @@
-package com.dxu.sso.course.application.config;
+package com.dxu.sso.user.admin.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,8 +10,8 @@ public class KafkaConfig {
 
     @Bean
     public KafkaTemplate<String, Object> kafkaTemplate(
-            ProducerFactory<String, Object> producerFactory) {
-        return new KafkaTemplate<>(producerFactory);
+            ProducerFactory<String, Object> factory) {
+        return new KafkaTemplate<>(factory);
     }
 }
 

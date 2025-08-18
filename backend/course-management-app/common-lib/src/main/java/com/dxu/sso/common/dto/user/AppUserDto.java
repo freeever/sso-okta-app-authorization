@@ -39,4 +39,6 @@ public class AppUserDto {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
+
+    private boolean deleted;
 }

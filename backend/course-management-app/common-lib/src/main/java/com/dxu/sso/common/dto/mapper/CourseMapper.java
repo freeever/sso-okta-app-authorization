@@ -17,6 +17,7 @@ public interface CourseMapper {
 
     // We’ll use this to build a new Course (without enrollments)
     @Mapping(target = "enrollments", ignore = true) // handled in service
+    @Mapping(target = "id", ignore = true)
     Course toEntity(CourseSaveRequest request);
 
     @Mapping(target = "id", source = "course.id")
