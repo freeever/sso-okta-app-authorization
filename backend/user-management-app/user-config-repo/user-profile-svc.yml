@@ -21,6 +21,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      # Prefer CHAR(36) instead of BINARY(16) for UUIDs
+      hibernate.type.preferred_uuid_jdbc_type: CHAR
 
 eureka:
   client:

@@ -37,6 +37,9 @@ public class CourseEnrollment {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "student_deleted", nullable = false)
+    private boolean studentDeleted; // primitive avoids nulls
+
     public Long getStudentId() {
         return id != null ? id.getStudentId() : null;
     }

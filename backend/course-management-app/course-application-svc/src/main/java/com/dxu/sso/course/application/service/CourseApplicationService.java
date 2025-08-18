@@ -43,7 +43,7 @@ public class CourseApplicationService {
     private final CourseWebClient courseWebClient;
     private final CourseApplicationRepository repository;
     private final CourseApplicationMapper mapper;
-    private final KafkaTemplate<String, CourseApplicationApprovedEvent> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     /**
      * Find applications of a course by status (used by ADMIN or TEACHER)
