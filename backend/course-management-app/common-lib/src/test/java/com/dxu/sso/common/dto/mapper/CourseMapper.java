@@ -46,6 +46,8 @@ class CourseMapperTest {
         assertEquals("Science", course.getName());
         assertEquals("Physics and Chemistry", course.getDescription());
         assertEquals(12L, course.getTeacherId());
+        assertNotNull(course.getEnrollments());
+        assertEquals(2, course.getEnrollments().size());
     }
 
     @Test

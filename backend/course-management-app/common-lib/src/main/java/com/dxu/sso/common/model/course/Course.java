@@ -43,5 +43,12 @@ public class Course {
     private Long teacherId;    // FK reference to AppUser.id (role=TEACHER)
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CourseEnrollment> enrollments = new ArrayList<>();
+    private List<CourseEnrollment> enrollments;
+
+    public List<CourseEnrollment> getEnrollments() {
+        if (enrollments == null) {
+            enrollments = new ArrayList<>();
+        }
+        return enrollments;
+    }
 }
