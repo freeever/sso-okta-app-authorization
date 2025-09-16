@@ -1,7 +1,7 @@
-package com.dxu.sso.user.admin.model.student;
+package com.dxu.sso.user.admin.saga.student;
 
-import com.dxu.sso.user.admin.model.common.SagaStatus;
-import com.dxu.sso.user.admin.model.common.StepStatus;
+import com.dxu.sso.user.admin.saga.common.SagaStatus;
+import com.dxu.sso.user.admin.saga.common.StepStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

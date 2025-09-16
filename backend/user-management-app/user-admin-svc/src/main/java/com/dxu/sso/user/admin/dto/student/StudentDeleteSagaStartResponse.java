@@ -1,6 +1,6 @@
 package com.dxu.sso.user.admin.dto.student;
 
-import com.dxu.sso.user.admin.model.common.SagaStatus;
+import com.dxu.sso.user.admin.saga.common.SagaStatus;
 
 import java.net.URI;
 import java.util.UUID;

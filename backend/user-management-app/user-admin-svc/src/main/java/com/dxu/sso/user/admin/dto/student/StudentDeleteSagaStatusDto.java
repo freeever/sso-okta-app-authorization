@@ -1,6 +1,6 @@
 package com.dxu.sso.user.admin.dto.student;
 
-import com.dxu.sso.user.admin.model.student.StudentDeleteSaga;
+import com.dxu.sso.user.admin.saga.student.StudentDeleteSaga;
 
 import java.time.Instant;
 import java.util.UUID;

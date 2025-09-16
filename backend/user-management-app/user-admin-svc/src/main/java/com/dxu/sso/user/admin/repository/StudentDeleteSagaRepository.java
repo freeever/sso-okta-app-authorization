@@ -1,7 +1,7 @@
 package com.dxu.sso.user.admin.repository;
 
-import com.dxu.sso.user.admin.model.common.SagaStatus;
-import com.dxu.sso.user.admin.model.student.StudentDeleteSaga;
+import com.dxu.sso.user.admin.saga.common.SagaStatus;
+import com.dxu.sso.user.admin.saga.student.StudentDeleteSaga;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Collection;
